@@ -1,0 +1,35 @@
+# --- BACKEND (Python) ---
+AppBackend/venv/
+AppBackend/bin/
+AppBackend/lib/
+AppBackend/lib64/
+AppBackend/include/
+AppBackend/pyvenv.cfg
+AppBackend/__pycache__/
+AppBackend/*.pyc
+AppBackend/.env
+
+# --- FRONTEND (React + Vite) ---
+AppFrontend/node_modules/
+AppFrontend/dist/
+AppFrontend/dist-ssr/
+AppFrontend/.env
+AppFrontend/.env.local
+AppFrontend/.env.development.local
+AppFrontend/.env.test.local
+AppFrontend/.env.production.local
+AppFrontend/npm-debug.log*
+AppFrontend/yarn-debug.log*
+AppFrontend/yarn-error.log*
+
+# --- BASE DE DATOS ---
+# Ignoramos archivos temporales de MySQL Workbench si existen
+DB/*.bak
+DB/*.tmp
+
+# --- SISTEMA Y EDITORES ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
