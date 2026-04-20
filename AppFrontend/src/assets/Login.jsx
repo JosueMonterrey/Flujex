@@ -41,21 +41,21 @@ export function Login() {
     };
 
     return (
-        <div class="d-flex justify-content-center align-items-center min-vh-100">
-            <form class="text-center px-5 pt-5 pb-4 bg-body-tertiary rounded shadow-sm" onSubmit={submitLogin} noValidate >
-                <h1 class="text-body-secondary fw-bold mb-5">
+        <div className="d-flex justify-content-center align-items-center min-vh-100">
+            <form className="text-center px-5 pt-5 pb-4 bg-body-tertiary rounded shadow-sm" onSubmit={submitLogin} noValidate >
+                <h1 className="text-body-secondary fw-bold mb-5">
                     Login to
-                    <span class="text-primary"> Flujex</span>    
+                    <span className="text-primary"> Flujex</span>    
                 </h1>
 
-                <div class="form-floating mb-3">
+                <div className="form-floating mb-3">
                     <input  type="text"
-                            class={`form-control ${!validCredentials ? 'is-invalid' : ''}`}
+                            className={`form-control ${!validCredentials ? 'is-invalid' : ''}`}
                             id="inputUsername"
                             placeholder="Username"
                             required
                             onChange={(e) => setUsername(e.target.value)} />
-                    <label for="inputUsername">Username</label>
+                    <label htmlFor="inputUsername">Username</label>
 					<div className="invalid-feedback">
 						Invalid username or password
 					</div>
@@ -63,11 +63,11 @@ export function Login() {
 
                 <PasswordInput onPasswordChange={(pwd) => setPassword(pwd)} validCredentials={validCredentials} ></PasswordInput>
 
-                <p class="text-start mb-4"><a href="" class="text-muted small text-decoration-none">Forgot your password?</a></p>
+                <p className="text-start mb-4"><a href="" className="text-muted small text-decoration-none">Forgot your password?</a></p>
 
-                <input type="submit" class="btn btn-primary fw-medium w-100 mb-3" value="Login" />
+                <input type="submit" className="btn btn-primary fw-medium w-100 mb-3" value="Login" />
 
-                <p class="small">Don't have an account? <Link to="/register">Register</Link></p>
+                <p className="small">Don't have an account? <Link to="/register">Register</Link></p>
             </form>
         </div>
     );

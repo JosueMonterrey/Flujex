@@ -31,13 +31,13 @@ export function PhoneInput() {
 
             </button>
 
-            <ul class="dropdown-menu"
+            <ul className="dropdown-menu"
                 style={countyDropownStyle} >
 
                 {getCountries().map((code) => (
                     <li>
                         <a  role="button"
-                            class="dropdown-item"
+                            className="dropdown-item"
                             onClick={() => setCountry(code)}>
                                 {countries[code]}
                         </a>
@@ -55,7 +55,7 @@ export function PhoneInput() {
                     id="floatingInput"
                     placeholder="12345678"
                 />
-                <label htmlFor="inputPhone">Phone</label>
+                <label htmlhtmlFor="inputPhone">Phone</label>
             </div>
         </div>
     );

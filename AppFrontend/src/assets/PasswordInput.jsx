@@ -10,17 +10,17 @@ export function PasswordInput({ onPasswordChange, validCredentials }) {
   }
 
   return (
-    <div class="input-group is-invalid">
-        <div class="form-floating">
+    <div className="input-group is-invalid">
+        <div className="form-floating">
             <input  type={showPassword ? "text" : "password"}
-                    class={`form-control ${!validCredentials ? 'is-invalid' : ''}`}
+                    className={`form-control ${!validCredentials ? 'is-invalid' : ''}`}
                     id="inputPassword"
                     placeholder=""
                     onChange={(e) => onPasswordChange(e.target.value)} />
-            <label for="inputPassword">Password</label>
+            <label htmlFor="inputPassword">Password</label>
         </div>
         <button type="button" className="btn btn-outline-secondary" onClick={togglePasswordVisibility}>
-            <i class={showPassword ? "bi bi-eye-slash" : "bi bi-eye"}></i>
+            <i className={showPassword ? "bi bi-eye-slash" : "bi bi-eye"}></i>
         </button>
     </div>
   );
