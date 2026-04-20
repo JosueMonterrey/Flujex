@@ -5,7 +5,6 @@ from src import main_routes
 app = Flask(__name__)
 CORS(app)
 
-# Registramos las rutas que definimos en el otro archivo
 app.register_blueprint(main_routes)
 
 if __name__ == '__main__':

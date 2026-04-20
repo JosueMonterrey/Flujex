@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 
 
-export function PasswordInput() {
+export function PasswordInput({ onPasswordChange, validCredentials }) {
+  
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
@@ -9,9 +10,13 @@ export function PasswordInput() {
   }
 
   return (
-    <div class="input-group">
+    <div class="input-group is-invalid">
         <div class="form-floating">
-            <input type={showPassword ? "text" : "password"} class="form-control" id="inputPassword" placeholder="" />
+            <input  type={showPassword ? "text" : "password"}
+                    class={`form-control ${!validCredentials ? 'is-invalid' : ''}`}
+                    id="inputPassword"
+                    placeholder=""
+                    onChange={(e) => onPasswordChange(e.target.value)} />
             <label for="inputPassword">Password</label>
         </div>
         <button type="button" className="btn btn-outline-secondary" onClick={togglePasswordVisibility}>
