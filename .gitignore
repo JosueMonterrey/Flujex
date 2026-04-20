@@ -6,6 +6,7 @@ AppBackend/lib64/
 AppBackend/include/
 AppBackend/pyvenv.cfg
 AppBackend/__pycache__/
+AppBackend/src/__pycache__/
 AppBackend/*.pyc
 AppBackend/.env
 
