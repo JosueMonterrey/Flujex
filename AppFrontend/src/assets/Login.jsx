@@ -25,7 +25,6 @@ export function Login() {
 
             const data = await response.json();
 
-			setValidCredentials(true);
             setValidCredentials(data.success);
 
             if (data.success) {
@@ -61,7 +60,7 @@ export function Login() {
 					</div>
                 </div>
 
-                <PasswordInput onPasswordChange={(pwd) => setPassword(pwd)} validCredentials={validCredentials} ></PasswordInput>
+                <PasswordInput placeholder={"Password"} onPasswordChange={(pwd) => setPassword(pwd)} validCredentials={validCredentials} ></PasswordInput>
 
                 <p className="text-start mb-4"><a href="" className="text-muted small text-decoration-none">Forgot your password?</a></p>
 

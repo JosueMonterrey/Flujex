@@ -21,5 +21,34 @@ def login():
         
         return jsonify({"success": False, "msg": "Wrong username or password"}), 401
     except Exception as e:
-        print("ERROR EN EL SERVIDOR:", traceback.format_exc())
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+
+@main_routes.route('/register', methods=['POST'])
+def register():
+    try:
+        data = request.get_json()
+
+        # check if user already exists
+        if get_user_by_email(data['email']):
+            return jsonify({"success": False, "msg": "There is already an account associated with this email"}), 409
+        
+        if get_user_by_username(data['username']):
+            return jsonify({"success": False, "msg": "Username is taken"}), 409
+
+        # hash password
+        password_bytes = data['password'].encode('utf-8')
+        salt = bcrypt.gensalt()
+        hashed_pwd_bytes = bcrypt.hashpw(password_bytes, salt)
+        hashed_pwd = hashed_pwd_bytes.decode('utf-8')
+        
+        # insert new user
+        if insert_new_user(data, hashed_pwd):
+            return jsonify({"success": True, "msg": "Account created successfully"}), 201
+    
+        return jsonify({"success": False, "msg": "Something went wrong when inserting into databse"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
         return jsonify({"error": str(e)}), 500

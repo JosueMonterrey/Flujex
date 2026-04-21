@@ -6,9 +6,8 @@ import Input from 'react-phone-number-input/input';
 import 'react-phone-number-input/style.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
 
-export function PhoneInput() {
+export function PhoneInput({ onPhoneChange }) {
     const [country, setCountry] = useState('CR');
-    const [phone, setPhone] = useState('');
 
     const countryDropdownBtnStyle = {
         minWidth: '80px'
@@ -35,7 +34,7 @@ export function PhoneInput() {
                 style={countyDropownStyle} >
 
                 {getCountries().map((code) => (
-                    <li>
+                    <li key={code}>
                         <a  role="button"
                             className="dropdown-item"
                             onClick={() => setCountry(code)}>
@@ -48,14 +47,15 @@ export function PhoneInput() {
 
             <div className="form-floating">
                 <Input
-                    country={country} // Esto le dice qué formato usar (MX, US, etc.)
-                    value={phone}
-                    onChange={setPhone}
-                    className="form-control" // Clases de Bootstrap
+                    country={country}
+                    value=""
+                    onChange={(ph) => onPhoneChange(ph)}
+                    className="form-control"
                     id="floatingInput"
                     placeholder="12345678"
+                    maxLength={20}
                 />
-                <label htmlhtmlFor="inputPhone">Phone</label>
+                <label htmlFor="inputPhone">Phone</label>
             </div>
         </div>
     );
