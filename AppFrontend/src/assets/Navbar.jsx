@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 export function Navbar({ navbarContent }) {
 
     return (
-        <div className="navbar w-100 p-0 border-bottom">
+        <div className="navbar w-100 p-2 border-bottom">
             <div className="content px-4 py-1 d-flex flex-fill align-items-center">
                 {navbarContent}
             </div>

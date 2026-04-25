@@ -30,6 +30,7 @@ export function Login() {
             if (data.success) {
                 localStorage.setItem("isLoggedIn", "true");
                 localStorage.setItem("username", username);
+                localStorage.setItem("user_id", data['user_id']);
 
                 navigate("/home");
             }

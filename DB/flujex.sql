@@ -24,8 +24,11 @@ CREATE TABLE user (
 -- 3. Tabla de Monedas	
 CREATE TABLE currency (
     currency_id		INT			PRIMARY KEY	AUTO_INCREMENT,
+    code            VARCHAR(10) NOT NULL UNIQUE,
     name			VARCHAR(50) NOT NULL,
-    symbol			VARCHAR(10) NOT NULL
+    symbol			VARCHAR(10) NOT NULL,
+
+    INDEX idx_code (code)
 );
 
 -- 4. Tabla de Cuentas

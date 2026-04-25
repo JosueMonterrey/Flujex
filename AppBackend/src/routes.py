@@ -17,7 +17,7 @@ def login():
             hash_bytes = user['hashed_pwd'].encode('utf-8')
 
             if bcrypt.checkpw(password_bytes, hash_bytes):
-                return jsonify({"success": True, "msg": "Login completed"}), 200
+                return jsonify({"success": True, "user_id" : user['user_id'], "msg": "Login completed"}), 200
         
         return jsonify({"success": False, "msg": "Wrong username or password"}), 401
     except Exception as e:
@@ -52,3 +52,28 @@ def register():
     except Exception as e:
         print("SERVER ERROR:", traceback.format_exc())
         return jsonify({"error": str(e)}), 500
+    
+
+@main_routes.route('/create_account', methods=['POST'])
+def create_account():
+    try:
+        data = request.get_json()
+
+        print("============ " + data["userId"] + " ============")
+
+        if get_account_by_name(data["userId"], data["name"]):
+            return jsonify({"success": False, "msg": "An account with the same name already exists"}), 409
+
+        currency_data = get_currency_by_code(data["currency"])
+        if currency_data == None:
+            return jsonify({"success": False, "msg": f"Currency {data["currency"]} does not exist"}), 404
+        
+        if insert_new_account(data["userId"], currency_data["currency_id"], data["name"], data["description"]):
+            return jsonify({"success": True, "msg": "Account created successfully"}), 201
+        
+        return jsonify({"success": False, "msg": "Something went wrong when inserting into database"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+    
