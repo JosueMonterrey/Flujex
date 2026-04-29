@@ -59,8 +59,6 @@ def create_account():
     try:
         data = request.get_json()
 
-        print("============ " + data["userId"] + " ============")
-
         if get_account_by_name(data["userId"], data["name"]):
             return jsonify({"success": False, "msg": "An account with the same name already exists"}), 409
 
@@ -72,6 +70,23 @@ def create_account():
             return jsonify({"success": True, "msg": "Account created successfully"}), 201
         
         return jsonify({"success": False, "msg": "Something went wrong when inserting into database"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+
+@main_routes.route('/get_accounts', methods=['POST'])
+def get_accounts():
+    try:
+        data = request.get_json()
+
+        accounts = get_accounts_by_user(data["userId"])
+
+        if accounts:
+            return jsonify({"success": True, "msg": "Accounts retrieved successfully", "accounts" : accounts}), 201
+        
+        return jsonify({"success": False, "msg": "Failed to get user accounts"}), 500
 
     except Exception as e:
         print("SERVER ERROR:", traceback.format_exc())

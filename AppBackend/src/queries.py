@@ -70,6 +70,39 @@ def get_currency_by_code(code):
         cursor.close()
         conn.close()
 
+def get_accounts_by_user(user_id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:        
+        query = """
+            SELECT acc.account_id,
+                acc.name AS account_name,
+                acc.description,
+                acc.balance,
+                acc.creation_date,
+                acc.updated_date,
+                cur.code,
+                cur.name AS currency_name,
+                cur.symbol
+            FROM account acc
+            JOIN currency cur
+                ON acc.currency_id = cur.currency_id
+            WHERE user_id = %s AND inactive_date > NOW()
+            ORDER BY acc.updated_date DESC
+        """
+        cursor.execute(query, [user_id])
+        accounts = cursor.fetchall()
+        return accounts
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        return None
+    
+    finally:
+        cursor.close()
+        conn.close()
+
 
 def get_account_by_name(user_id, account_name):
     conn = get_connection()

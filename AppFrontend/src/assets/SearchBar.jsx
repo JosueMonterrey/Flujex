@@ -8,8 +8,8 @@ export function SearchBar({ placeholder, onSearch }) {
     const submitSearch = (e) => {
         e.preventDefault();
 
-        if (search.length > 0)
-            onSearch(search);
+        // if (search.length > 0)
+        onSearch(search);
     };
 
     return (

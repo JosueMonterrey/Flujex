@@ -2,7 +2,7 @@ import { API_URL } from '../config';
 import { useState } from 'react';
 import { Modal } from 'react-bootstrap';
 
-export function NewAccount() {
+export function NewAccount({ onCreateSuccessful }) {
 
     const [creationError, setCreationError] = useState("");
     const [showModal, setShowModal] = useState(false);
@@ -67,7 +67,8 @@ export function NewAccount() {
 
             if (data.success) {
                 setCreationError("");
-                console.log("Success!");
+                setShowModal(false);
+                onCreateSuccessful();
             }
 
             else {
