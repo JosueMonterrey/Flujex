@@ -1,6 +1,13 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export function Navbar({ navbarContent }) {
+
+    const navigate = useNavigate();
+
+    const logout = () => {
+        localStorage.clear();
+        navigate("/login");
+    }
 
     return (
         <div className="navbar w-100 p-2 border-bottom">
@@ -21,10 +28,10 @@ export function Navbar({ navbarContent }) {
                         </li>
                         <li><hr className="dropdown-divider" /></li>
                         <li>
-                            <Link to="/login" className="dropdown-item">
+                            <a onClick={logout} role='button' className="dropdown-item">
                                 <i className="bi bi-box-arrow-left me-2"></i>
                                 Log out
-                            </Link>
+                            </a>
                         </li>
                     </ul>
                 </div>
