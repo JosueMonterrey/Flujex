@@ -1,4 +1,8 @@
+import { useNavigate } from 'react-router-dom';
+
 export function AccountCard( {name, balance, description, currencySymbol} ) {
+
+    const navigate = useNavigate();
 
     let maxDescriptionLength = 100;
     return (
@@ -7,7 +11,8 @@ export function AccountCard( {name, balance, description, currencySymbol} ) {
                 width: '400px',
                 maxWidth: '100%',
                 cursor: 'pointer'
-            }}>
+            }}
+            onClick={() => navigate("/account-dashboard")} >
 
             <p className="fs-5 fw-bold text-body-secondary mb-3"> {name} </p>
 
