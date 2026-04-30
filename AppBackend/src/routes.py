@@ -91,4 +91,69 @@ def get_accounts():
     except Exception as e:
         print("SERVER ERROR:", traceback.format_exc())
         return jsonify({"error": str(e)}), 500
+
+
+@main_routes.route('/get_account_details', methods=['POST'])
+def get_account_details():
+    try:
+        data = request.get_json()
+
+        account = get_account_by_id(data["id"])
+
+        if account:
+            return jsonify({"success": True, "msg": "Account details retrieved successfully", "account" : account}), 201
+        
+        return jsonify({"success": False, "msg": "Failed to get account details"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+
+@main_routes.route('/get_account_transfers_out', methods=['POST'])
+def get_account_transfers_out():
+    try:
+        data = request.get_json()
+
+        transactions_data = get_transactions_out_time_interval(data["id"], data["days"]) if "days" in data else get_transactions_out_time_interval(data["id"])
+
+        if transactions_data:
+            return jsonify({"success": True, "msg": "Transactions retrieved successfully", "transactions_data" : transactions_data}), 201
+        
+        return jsonify({"success": False, "msg": "Failed to get transactions"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
     
+
+@main_routes.route('/get_account_transfers_in', methods=['POST'])
+def get_account_transfers_in():
+    try:
+        data = request.get_json()
+
+        transactions_data = get_transactions_in_time_interval(data["id"], data["days"]) if "days" in data else get_transactions_in_time_interval(data["id"])
+
+        if transactions_data:
+            return jsonify({"success": True, "msg": "Transactions retrieved successfully", "transactions_data" : transactions_data}), 201
+        
+        return jsonify({"success": False, "msg": "Failed to get transactions"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+
+@main_routes.route('/get_most_spent_categories', methods=['POST'])
+def get_most_spent_categories():
+    try:
+        data = request.get_json()
+
+        categories_data = get_most_spent_categories_time_interval(data["id"], data["days"]) if "days" in data else get_most_spent_categories_time_interval(data["id"])
+
+        return jsonify({"success": True, "msg": "Categories calculated successfully", "categories_data" : categories_data}), 201        
+        # return jsonify({"success": False, "msg": "Failed to get categories"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500

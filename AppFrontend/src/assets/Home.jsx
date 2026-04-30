@@ -5,6 +5,7 @@ import { SearchBar } from './SearchBar';
 import { AccountCard } from './AccountCard';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { LoadingText } from './LoadingText';
 
 export function Home() {
 
@@ -81,10 +82,11 @@ export function Home() {
 			<div className="p-5 overflow-y-auto d-flex flex-wrap">
 				{
 					loading
-						? <p className="small text-muted">LOADING...</p>
+						? <LoadingText />
 						: accounts.length > 0
 							? accounts.map((account) => <AccountCard
 															key={account.account_id}
+															id={account.account_id}
 															name={account.account_name}
 															balance={account.balance}
 															description={account.description}

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Login } from './assets/Login';
 import { Register } from './assets/Register';
 import { Home } from './assets/Home';
-import { AccountDashboard } from './AccountDashboard';
+import { AccountDashboard } from './assets/AccountDashboard';
 
 import './App.css'
 
@@ -17,7 +17,7 @@ function App() {
 				<Route path="/login" element={<Login />} />
 				<Route path="/register" element={<Register />} />
 				<Route path="/home" element={<Home />} />
-				<Route path="/account-dashboard" element={<AccountDashboard />} />				
+				<Route path="/account-dashboard/:id" element={<AccountDashboard />} />				
 			</Routes>
 		</Router>
 	);

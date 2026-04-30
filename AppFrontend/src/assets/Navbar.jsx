@@ -1,3 +1,4 @@
+import { Dropdown } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 export function Navbar({ navbarContent }) {
@@ -15,26 +16,21 @@ export function Navbar({ navbarContent }) {
                 {navbarContent}
             </div>
             <div className="options px-2 py-1 border-start">
-                <div className="dropdown">
-                    <button className="btn dropdown-toggle border border-0 text-secondary" data-bs-toggle="dropdown" aria-expanded="false">
+                <Dropdown>
+                    <Dropdown.Toggle variant="light">
                         <i className="bi bi-list"></i>
-                    </button>
-                    <ul className="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <a className="dropdown-item" href="#">
-                                <i className="bi bi-gear me-2"></i>
-                                Settings
-                            </a>
-                        </li>
-                        <li><hr className="dropdown-divider" /></li>
-                        <li>
-                            <a onClick={logout} role='button' className="dropdown-item">
-                                <i className="bi bi-box-arrow-left me-2"></i>
-                                Log out
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        <Dropdown.Item>
+                            <i className="bi bi-gear me-2"></i>
+                            Settings
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={logout}>
+                            <i className="bi bi-box-arrow-left me-2"></i>
+                            Log out
+                        </Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
             </div>
         </div>
     );
