@@ -2,6 +2,9 @@ from flask import Blueprint, request, jsonify
 from .queries import *
 import bcrypt 
 import traceback
+import requests
+import os
+from dotenv import load_dotenv
 
 main_routes = Blueprint('main_routes', __name__)
 
@@ -61,12 +64,8 @@ def create_account():
 
         if get_account_by_name(data["userId"], data["name"]):
             return jsonify({"success": False, "msg": "An account with the same name already exists"}), 409
-
-        currency_data = get_currency_by_code(data["currency"])
-        if currency_data == None:
-            return jsonify({"success": False, "msg": f"Currency {data["currency"]} does not exist"}), 404
         
-        if insert_new_account(data["userId"], currency_data["currency_id"], data["name"], data["description"]):
+        if insert_new_account(data["userId"], data["currencyId"], data["name"], data["description"]):
             return jsonify({"success": True, "msg": "Account created successfully"}), 201
         
         return jsonify({"success": False, "msg": "Something went wrong when inserting into database"}), 500
@@ -83,10 +82,48 @@ def get_accounts():
 
         accounts = get_accounts_by_user(data["userId"])
 
-        if accounts:
+        if accounts is not None:
             return jsonify({"success": True, "msg": "Accounts retrieved successfully", "accounts" : accounts}), 201
         
         return jsonify({"success": False, "msg": "Failed to get user accounts"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+
+@main_routes.route('/get_categories', methods=['POST'])
+def get_categories():
+    try:
+        data = request.get_json()
+
+        category_type = "Both" if data["movementType"] == "Transfer" else data["movementType"]
+
+        categories = []
+        if category_type == "Both":
+            categories = get_categories_by_user_and_type(data["userId"], category_type)
+        else:
+            categories = get_categories_by_user_and_multiple_type(data["userId"], category_type, "Both")
+
+        if categories is not None:
+            return jsonify({"success": True, "msg": "Categories retrieved successfully", "categories" : categories}), 201
+        
+        return jsonify({"success": False, "msg": "Failed to get user categories"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+
+@main_routes.route('/get_currencies', methods=['POST'])
+def get_currencies():
+    try:
+        currencies = get_all_currencies()
+
+        if currencies:
+            return jsonify({"success": True, "msg": "All currencies retrieved", "currencies": currencies}), 201
+        
+        return jsonify({"success": False, "msg": "Failed to get currencies"}), 500
 
     except Exception as e:
         print("SERVER ERROR:", traceback.format_exc())
@@ -157,3 +194,73 @@ def get_most_spent_categories():
     except Exception as e:
         print("SERVER ERROR:", traceback.format_exc())
         return jsonify({"error": str(e)}), 500
+    
+
+@main_routes.route('/new_transaction', methods=['POST'])
+def new_transaction():
+    try:
+        data = request.get_json()
+
+        acc_origin = data["accountOrigin"]
+        acc_destiny = data["accountDestiny"]
+        category = data["category"]
+
+        # HANDLE EXTERNAL SOURCE ACCOUNTS
+        if data["movementType"] == "Income" or acc_origin == None:
+            acc_origin = get_account_by_name(data["userId"], "[SYSTEM_ORIGIN]")
+            if acc_origin == None:
+                raise Exception("[SYSTEM_ORIGIN] account not found")
+
+        if data["movementType"] == "Expense" or acc_destiny == None:
+            acc_destiny = get_account_by_name(data["userId"], "[SYSTEM_DESTINY]")
+            if acc_destiny == None:
+                raise Exception("[SYSTEM_DESTINY] account not found")
+
+        # HANDLE UNCATEGORIZED TRANSACTIONS
+        if category == None:
+            category = get_category_by_name(data["userId"], "[UNCATEGORIZED]")
+            if category == None:
+                raise Exception("[UNCATEGORIZED] category not found")
+            
+
+        # HANDLE EXCHANGE RATE
+        xchg_rate_origin = get_exchange_rate_today(acc_origin["currency_id"])
+        xchg_rate_destiny = get_exchange_rate_today(acc_destiny["currency_id"])
+
+        if xchg_rate_origin == None or xchg_rate_destiny == None:
+            print("ExchangeRate-API queried")
+            api_key = os.getenv('XCHG_RATE_API_KEY')
+            url = f"https://v6.exchangerate-api.com/v6/{api_key}/latest/USD"
+            response = requests.get(url)
+
+            if response.status_code == 200:
+                data = response.json()
+                rates = data["conversion_rates"]
+
+                if xchg_rate_origin == None:
+                    insert_exchange_rate(acc_origin["currency_id"], rates[acc_origin["code"]])
+                    xchg_rate_origin = get_exchange_rate_today(acc_origin["currency_id"])
+                
+                if xchg_rate_destiny == None:
+                    insert_exchange_rate(acc_destiny["currency_id"], rates[acc_destiny["code"]])
+                    xchg_rate_destiny = get_exchange_rate_today(acc_destiny["currency_id"])
+            else:
+                raise Exception("Failed to get exchange rates")
+
+
+        base_to_origin = float(xchg_rate_origin["rate_to_base"])
+        base_to_destiny = float(xchg_rate_destiny["rate_to_base"])
+        origin_to_base = 1 / base_to_origin
+        
+        amount_origin = float(data["amount"])
+        amount_destiny = amount_origin * origin_to_base * base_to_destiny
+
+        if insert_new_transaction(acc_origin["account_id"], acc_destiny["account_id"], category["category_id"], data["movementType"], amount_origin, amount_destiny, xchg_rate_origin["rate_id"], data["description"]):
+            return jsonify({"success": True, "msg": "Movement successful"}), 201
+
+        return jsonify({"success": False, "msg": "Something went wrong when inserting into database"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+

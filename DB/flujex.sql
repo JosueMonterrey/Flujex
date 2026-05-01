@@ -51,17 +51,17 @@ CREATE TABLE account (
 -- 5. Tabla de Categorías
 CREATE TABLE category (
     category_id		INT									PRIMARY KEY	AUTO_INCREMENT,
-    account_id		INT									NOT NULL,
+    user_id         INT									NOT NULL,
     name			VARCHAR(50)							NOT NULL,
     description		VARCHAR(255)						NOT NULL,
     color_r			TINYINT								NOT NULL	DEFAULT 0,
     color_g			TINYINT								NOT NULL	DEFAULT 0,
     color_b			TINYINT								NOT NULL	DEFAULT 0,
-    type_allowed	ENUM('Ingreso', 'Gasto', 'Ambos')	NOT NULL	DEFAULT 'Ambos',
+    type_allowed	ENUM('Deposit', 'Expense', 'Both')	NOT NULL	DEFAULT 'Both',
     inactive_date	TIMESTAMP							NOT NULL	DEFAULT '2038-01-01 00:00:00',
     	
-    CONSTRAINT fk_cat_acc		FOREIGN KEY (account_id)		REFERENCES account(account_id)		ON DELETE CASCADE,
-    INDEX idx_acc_category (account_id)
+    CONSTRAINT fk_cat_usr		FOREIGN KEY (user_id)		REFERENCES user(user_id)		ON DELETE CASCADE,
+    INDEX idx_usr_category (user_id)
 );
 
 -- 6. Tabla de Metas de Ahorro
@@ -98,7 +98,7 @@ CREATE TABLE exchange_rate (
 	rate_id			INT				PRIMARY KEY AUTO_INCREMENT,
 	currency_id		INT				NOT NULL,
 	rate_to_base	DECIMAL(12, 6)	NOT NULL,
-	rate_date		DATE			NOT NULL,
+	rate_date		DATE			NOT NULL    DEFAULT (CURRENT_DATE),
 	
 	CONSTRAINT fk_rate_curr			FOREIGN KEY (currency_id)		REFERENCES currency(currency_id),
 	UNIQUE KEY		(currency_id, rate_date)
@@ -110,7 +110,7 @@ CREATE TABLE transaction (
     origin_acc_id		INT											NOT NULL,
     destiny_acc_id		INT											NOT NULL,
     category_id			INT											NOT NULL,
-    type				ENUM('Gasto', 'Ingreso', 'Transferencia')	NOT NULL	DEFAULT 'Transferencia',
+    type				ENUM('Expense', 'Deposit', 'Transfer')  	NOT NULL	DEFAULT 'Transfer',
     amount_origin		DECIMAL(12,2)								NOT NULL,
     amount_destiny		DECIMAL(12,2)								NOT NULL,
     rate_id				INT											NOT NULL,
@@ -153,7 +153,7 @@ CREATE TABLE subscription (
 	amount				DECIMAL(12, 2)									NOT NULL,
 	start_date			DATE											NOT NULL	DEFAULT (CURRENT_DATE),
 	next_date			DATE											NOT NULL	DEFAULT (CURRENT_DATE),
-	frequency			ENUM('Diario', 'Semanal', 'Mensual', 'Anual')	NOT NULL,
+	frequency			ENUM('Daily', 'Weekly', 'Monthly', 'Annually')	NOT NULL,
 	updated_date		TIMESTAMP										NOT NULL	DEFAULT CURRENT_TIMESTAMP	ON UPDATE CURRENT_TIMESTAMP,
 	inactive_date		TIMESTAMP										NOT NULL	DEFAULT '2038-01-01 00:00:00',
 	

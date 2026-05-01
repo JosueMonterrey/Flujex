@@ -1,6 +1,6 @@
 import { API_URL } from '../config';
-import { useState } from 'react';
-import { Modal } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import { Dropdown, Modal } from 'react-bootstrap';
 
 export function NewAccount({ onCreateSuccessful }) {
 
@@ -17,14 +17,33 @@ export function NewAccount({ onCreateSuccessful }) {
         return isValid;
     };
 
-    const [currency, setCurrency] = useState("");
-    const [isValidCurrency, setIsValidCurrency] = useState(false);
-    const getCurrencies = () => ["CRC", "USD", "EUR"];
-    const checkCurrencyValid = (currency) => {
-        setCurrency(currency);
-        let isValid = currency.length > 0;
-        setIsValidCurrency(isValid);
-        return isValid;
+    const [currency, setCurrency] = useState(null);
+    const [currencies, setCurrencies] = useState([]);
+
+    useEffect(() => {
+        getCurrencies();
+    }, []);
+
+    const getCurrencies = async () => {
+        try {
+            const response = await fetch(`${API_URL}/get_currencies`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                setCurrencies(data["currencies"]);
+            }
+
+            else {
+                setCreationError(data['msg']);
+            }
+        }
+        catch (error) {
+            console.error("Connection error", error);
+        }
     }
 
     const [description, setDescription] = useState("");
@@ -32,7 +51,6 @@ export function NewAccount({ onCreateSuccessful }) {
     const resetForm = () => {
         setName("");
         setIsValidName(true);
-        checkCurrencyValid("")
         setDescription("");
         setCreationError("");
     }
@@ -45,12 +63,14 @@ export function NewAccount({ onCreateSuccessful }) {
             if (!checkNameValid(name))
                 return setCreationError("Invalid name. Only lower and uppercase letters accepted.");
 
-            if (!checkCurrencyValid(currency))
+            if (currency == null)
                 return setCreationError("Please choose a currency.");
 
             let userId = localStorage.getItem("user_id");
             if (!userId)
                 return setCreationError("You are not logged in.");
+
+            let currencyId = currency["currency_id"];
 
             const response = await fetch(`${API_URL}/create_account`, {
                 method: 'POST',
@@ -58,7 +78,7 @@ export function NewAccount({ onCreateSuccessful }) {
                 body: JSON.stringify({
                     userId,
                     name,
-                    currency,
+                    currencyId,
                     description
                 })
             });
@@ -108,22 +128,20 @@ export function NewAccount({ onCreateSuccessful }) {
                             />
                             <label htmlFor="accountNameInput" className='px-4'>Account Name</label>
                         </div>
-                        <div className="col dropdown">
-                            <button className="btn btn-outline-secondary dropdown-toggle w-100 h-100 text-start" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                {isValidCurrency ? currency : "Currency"}
-                            </button>
-                            <ul className="dropdown-menu">
-                                {getCurrencies().map((code) => (
-                                    <li key={code}>
-                                        <a className="dropdown-item"
-                                            role="button"
-                                            onClick={ () => checkCurrencyValid(`${code}`) } >
-                                                {code}
-                                        </a>
-                                    </li>
+                        <Dropdown className='col'>
+                            <Dropdown.Toggle variant="light" className='text-start w-100 h-100'>
+                                {currency == null ? "Currency" : currency["code"]}
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                {currencies.map((curr) => (
+                                    <Dropdown.Item key={curr.currency_id}
+                                        onClick={() => setCurrency(curr)}>
+                                        {curr.code}
+                                        <span className="text-muted small ms-2">{curr.symbol}</span>
+                                    </Dropdown.Item>
                                 ))}
-                            </ul>
-                        </div>
+                            </Dropdown.Menu>
+                        </Dropdown>
                     </div>
 
                     <div className="form-floating mb-5">

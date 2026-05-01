@@ -4,8 +4,10 @@ import { NewAccount } from './NewAccount';
 import { SearchBar } from './SearchBar';
 import { AccountCard } from './AccountCard';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { LoadingText } from './LoadingText';
+import { NewTransaction } from './NewTransaction';
+import { Popover } from 'bootstrap';
 
 export function Home() {
 
@@ -47,6 +49,7 @@ export function Home() {
 			});
 
 			const data = await response.json();
+
 			return data.success ? data["accounts"] : null;
 
 		} catch (error) {
@@ -71,26 +74,52 @@ export function Home() {
 		setAccounts(similiar);
 	};
 
+	const popoverRef = useRef(null);
+	useEffect(() => {
+		loadPopover();
+	}, [loading]);
+	const loadPopover = () => {
+		let popoverInstance = null;
+
+		if (popoverRef.current) {
+			popoverInstance = new Popover(popoverRef.current, {
+				trigger: 'hover focus',
+				content: "New Transaction",
+				placement: 'left'
+			});
+		}
+	}
+
 	return (
-		<div className="d-flex flex-column " style={{height: '100vh'}}>
+		<div className="d-flex flex-column " style={{ height: '100vh' }}>
 			<Navbar navbarContent={
 				<>
 					<SearchBar placeholder="Search accounts" onSearch={(s) => searchAccounts(s)} />
 					<NewAccount onCreateSuccessful={fetchAndSetAccounts} />
 				</>
 			} />
+
+			<div className="position-absolute" ref={popoverRef} style={{
+				right: '45px',
+				bottom: '35px'
+			}}>
+				<NewTransaction onCreateSuccessful={fetchAndSetAccounts} />
+			</div>
+
 			<div className="p-5 overflow-y-auto d-flex flex-wrap">
 				{
 					loading
 						? <LoadingText />
 						: accounts.length > 0
-							? accounts.map((account) => <AccountCard
-															key={account.account_id}
-															id={account.account_id}
-															name={account.account_name}
-															balance={account.balance}
-															description={account.description}
-															currencySymbol={account.symbol} /> )
+							? accounts.map((account) => (account.account_name == "[SYSTEM_ORIGIN]" || account.account_name == "[SYSTEM_DESTINY]")
+								? ""
+								: <AccountCard
+									key={account.account_id}
+									id={account.account_id}
+									name={account.account_name}
+									balance={account.balance}
+									description={account.description}
+									currencySymbol={account.symbol} />)
 							: <p className="alert alert-info">No accounts found.</p>
 				}
 			</div>

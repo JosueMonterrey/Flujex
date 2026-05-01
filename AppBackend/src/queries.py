@@ -68,8 +68,16 @@ def insert_new_user(data, hashed_pwd):
             data['email'],
             data['phone']
         ]
-        
         cursor.execute(query, values)
+
+        conn.commit()
+
+        new_user = get_user_by_email(data["email"])
+        base_currency = get_currency_by_code("USD")
+        insert_new_account(new_user["user_id"], base_currency["currency_id"], "[SYSTEM_ORIGIN]", "System account for external deposits.")
+        insert_new_account(new_user["user_id"], base_currency["currency_id"], "[SYSTEM_DESTINY]", "System account for external expenses.")
+        insert_new_category(new_user["user_id"], "[UNCATEGORIZED]", "No category", 0, 0, 0, "Both")
+
         conn.commit()
         
         return cursor.rowcount > 0
@@ -106,6 +114,99 @@ def get_currency_by_code(code):
     finally:
         cursor.close()
         conn.close()
+
+
+def get_currency_by_id(currency_id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:        
+        query = """
+            SELECT *
+            FROM currency
+            WHERE currency_id = %s
+        """
+        cursor.execute(query, [currency_id])
+        user = cursor.fetchone()
+        return user
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        return None
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def get_all_currencies():
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:        
+        cursor.execute("SELECT * FROM currency")
+        currencies = cursor.fetchall()
+        return currencies
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        return None
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def get_exchange_rate_today(currency_id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        query = """
+            SELECT *
+            FROM exchange_rate
+            WHERE currency_id = %s
+                AND rate_date = CURDATE()
+        """
+
+        cursor.execute(query, [currency_id])
+        rate = cursor.fetchone()
+        return rate
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        return None
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def insert_exchange_rate(currency_id, rate_to_base):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        query = """
+            INSERT INTO exchange_rate (currency_id, rate_to_base)
+            VALUES (%s, %s)
+        """
+
+        values = [currency_id, rate_to_base]
+        
+        cursor.execute(query, values)
+        conn.commit()
+        
+        return cursor.rowcount > 0
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        conn.rollback()
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
 #
 
 # ACCOUNTS
@@ -121,13 +222,17 @@ def get_accounts_by_user(user_id):
                 acc.balance,
                 acc.creation_date,
                 acc.updated_date,
+                cur.currency_id,
                 cur.code,
                 cur.name AS currency_name,
                 cur.symbol
             FROM account acc
             JOIN currency cur
                 ON acc.currency_id = cur.currency_id
-            WHERE user_id = %s AND inactive_date > NOW()
+            WHERE user_id = %s
+                AND NOT acc.name = "[SYSTEM_ORIGIN]"
+                AND NOT acc.name = "[SYSTEM_DESTINY]"
+                AND inactive_date > NOW()
             ORDER BY acc.updated_date DESC
         """
         cursor.execute(query, [user_id])
@@ -149,9 +254,22 @@ def get_account_by_name(user_id, account_name):
 
     try:        
         query = """
-            SELECT *
-            FROM account
-            WHERE user_id = %s AND name = %s AND inactive_date > NOW()
+            SELECT acc.account_id,
+                acc.name AS account_name,
+                acc.description,
+                acc.balance,
+                acc.creation_date,
+                acc.updated_date,
+                cur.currency_id,
+                cur.code,
+                cur.name AS currency_name,
+                cur.symbol
+            FROM account acc
+            JOIN currency cur
+                ON acc.currency_id = cur.currency_id
+            WHERE user_id = %s
+                AND acc.name = %s
+                AND inactive_date > NOW()
         """
         cursor.execute(query, [user_id, account_name])
         user = cursor.fetchone()
@@ -178,13 +296,15 @@ def get_account_by_id(account_id):
                 acc.balance,
                 acc.creation_date,
                 acc.updated_date,
+                cur.currency_id,
                 cur.code,
                 cur.name AS currency_name,
                 cur.symbol
             FROM account acc
             JOIN currency cur
                 ON acc.currency_id = cur.currency_id
-            WHERE account_id = %s AND inactive_date > NOW()
+            WHERE account_id = %s
+                AND inactive_date > NOW()
         """
         cursor.execute(query, [account_id])
         account = cursor.fetchone()
@@ -277,9 +397,152 @@ def get_transactions_in_time_interval(account_id, days=9999):
     finally:
         cursor.close()
         conn.close()
+
+
+def insert_new_transaction(origin_acc_id, destiny_acc_id, category_id, mov_type, amount_origin, amount_destiny, rate_id, description):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        query = """
+            INSERT INTO transaction (origin_acc_id, destiny_acc_id, category_id, type, amount_origin, amount_destiny, rate_id, description)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        values = [origin_acc_id, destiny_acc_id, category_id, mov_type, amount_origin, amount_destiny, rate_id, description]
+
+        cursor.execute(query, values)
+
+        if mov_type in ["Transfer", "Expense"]:
+            cursor.execute(
+                "UPDATE account SET balance = balance - %s WHERE account_id = %s",
+                [amount_origin, origin_acc_id]
+            )
+
+        if mov_type in ["Transfer", "Deposit"]:
+            cursor.execute(
+                "UPDATE account SET balance = balance + %s WHERE account_id = %s",
+                [amount_destiny, destiny_acc_id]
+            )
+
+        conn.commit()
+        
+        return cursor.rowcount > 0
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        conn.rollback()
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
 #
 
 # CATEGORIES
+def get_categories_by_user_and_multiple_type(user_id, type_allowed_1, type_allowed_2):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:        
+        query = """
+            SELECT *
+            FROM category
+            WHERE user_id = %s
+                AND NOT name = '[UNCATEGORIZED]'
+                AND type_allowed IN (%s, %s)
+                AND inactive_date > NOW()
+            ORDER BY name
+        """
+        cursor.execute(query, [user_id, type_allowed_1, type_allowed_2])
+        categories = cursor.fetchall()
+        return categories
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        return None
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def get_categories_by_user_and_type(user_id, type_allowed):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:        
+        query = """
+            SELECT *
+            FROM category
+            WHERE user_id = %s
+                AND NOT name = '[UNCATEGORIZED]'
+                AND type_allowed = %s
+                AND inactive_date > NOW()
+            ORDER BY name
+        """
+        cursor.execute(query, [user_id, type_allowed])
+        categories = cursor.fetchall()
+        return categories
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        return None
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def get_category_by_name(user_id, category_name):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:        
+        query = """
+            SELECT *
+            FROM category
+            WHERE user_id = %s AND name = %s AND inactive_date > NOW()
+        """
+        cursor.execute(query, [user_id, category_name])
+        category = cursor.fetchone()
+        return category
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        return None
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def insert_new_category(user_id, name, description, R, G, B, type_allowed):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        query = """
+            INSERT INTO category (user_id, name, description, color_r, color_g, color_b, type_allowed)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """
+
+        values = [user_id, name, description, R, G, B, type_allowed]
+        
+        cursor.execute(query, values)
+        conn.commit()
+        
+        return cursor.rowcount > 0
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        conn.rollback()
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
 def get_most_spent_categories_time_interval(account_id, days=9999):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
@@ -287,14 +550,15 @@ def get_most_spent_categories_time_interval(account_id, days=9999):
     try:        
         query = """
             SELECT
+                t.category_id,
                 c.name,
-                IFNULL(COUNT(transaction_id), 0) AS amount_transactions,
-                IFNULL(SUM(amount_origin), 0) AS total_out
+                IFNULL(COUNT(t.transaction_id), 0) AS amount_transactions,
+                IFNULL(SUM(t.amount_origin), 0) AS total_out
             FROM transaction AS t
             JOIN category AS c
                 ON t.category_id = c.category_id
-            WHERE origin_acc_id = %s
-            AND transaction_date >= DATE_SUB(NOW(), INTERVAL %s DAY)
+            WHERE t.origin_acc_id = %s
+            AND t.transaction_date >= DATE_SUB(NOW(), INTERVAL %s DAY)
             GROUP BY t.category_id
             ORDER BY total_out DESC
         """

@@ -227,7 +227,7 @@ export function AccountDashboard() {
                                         mostSpentCategories.length > 0
                                             ? <ol>
                                                 {
-                                                    mostSpentCategories.map((category) => <li>
+                                                    mostSpentCategories.map((category) => <li key={category["category_id"]}>
                                                         <p>{category["name"]}:
                                                             <span className="fw-light text-muted">
                                                                 ({category["amount_transactions"]}) {category["total_out"]}
@@ -245,7 +245,7 @@ export function AccountDashboard() {
                                         mostSpentCategories.length > 0
                                             ? <ol>
                                                 {
-                                                    mostSpentCategories.map((category) => <li>
+                                                    mostSpentCategories.map((category) => <li key={category["category_id"]}>
                                                         <p> {category["name"]} {category["total_out"]}
                                                         </p>
                                                     </li>)
