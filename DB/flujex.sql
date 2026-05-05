@@ -64,21 +64,6 @@ CREATE TABLE category (
     INDEX idx_usr_category (user_id)
 );
 
--- 6. Tabla de Metas de Ahorro
-CREATE TABLE savings_goal (
-    savings_id		INT				PRIMARY KEY AUTO_INCREMENT,
-    account_id		INT				NOT NULL,
-    name			VARCHAR(100)	NOT NULL,
-    target_amount	DECIMAL(12,2)	NOT NULL,
-    current_amount	DECIMAL(12,2)	NOT NULL	DEFAULT 0.00,
-    deadline		DATE			NOT NULL,
-    creation_date	TIMESTAMP		NOT NULL	DEFAULT CURRENT_TIMESTAMP,
-    updated_date	TIMESTAMP		NOT NULL	DEFAULT CURRENT_TIMESTAMP		ON UPDATE CURRENT_TIMESTAMP,
-    inactive_date	TIMESTAMP		NOT NULL	DEFAULT '2038-01-01 00:00:00',
-    
-    CONSTRAINT fk_savings_acc		FOREIGN KEY	(account_id)		REFERENCES account(account_id) 		ON DELETE CASCADE
-);
-
 -- 7. Tabla de Presupuestos Mensuales
 CREATE TABLE budget (
     budget_id		INT				PRIMARY KEY AUTO_INCREMENT,
