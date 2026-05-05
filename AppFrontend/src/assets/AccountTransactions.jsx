@@ -157,13 +157,31 @@ export function AccountTransactions() {
                                                         {
                                                             t.type == "Transfer"
                                                                 ? t.origin_id == id
-                                                                    ? <Link to={`/account-dashboard/${t.destiny_id}`} className="alert-link">
+                                                                    ? <Link to={
+                                                                        new Date(t.destiny_inactive_date).getTime() > new Date().getTime()
+                                                                            ? `/account-dashboard/${t.destiny_id}` : ""
+                                                                    }
+                                                                        className="alert-link" >
                                                                         <i className="bi bi-box-arrow-down me-3"></i>
+
                                                                         {t.destiny_name}
+                                                                        {
+                                                                            new Date(t.destiny_inactive_date).getTime() < new Date().getTime()
+                                                                                ? " (deleted)" : ""
+                                                                        }
                                                                     </Link>
-                                                                    : <Link to={`/account-dashboard/${t.origin_id}`} className="alert-link">
-                                                                        <i className="bi bi-box-arrow-up me-3"></i>
+                                                                    : <Link to={
+                                                                        new Date(t.origin_inactive_date).getTime() > new Date().getTime()
+                                                                            ? `/account-dashboard/${t.origin_id}` : ""
+                                                                    }
+                                                                        className="alert-link" >
+                                                                        <i className="bi bi-box-arrow-down me-3"></i>
+
                                                                         {t.origin_name}
+                                                                        {
+                                                                            new Date(t.origin_inactive_date).getTime() < new Date().getTime()
+                                                                                ? " (deleted)" : ""
+                                                                        }
                                                                     </Link>
                                                                 : ""
                                                         }

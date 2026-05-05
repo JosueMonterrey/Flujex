@@ -393,9 +393,11 @@ def get_account_transactions(account_id):
                 x.rate_to_base,
                 a_orig.account_id AS origin_id,
                 a_orig.name AS origin_name,
+                a_orig.inactive_date AS origin_inactive_date,
                 orig_curr.symbol AS origin_currency_symbol,
                 a_dest.account_id AS destiny_id,
                 a_dest.name AS destiny_name,
+                a_dest.inactive_date AS destiny_inactive_date,
                 dest_curr.symbol AS destiny_currency_symbol
             FROM transaction AS t
             JOIN category AS c
