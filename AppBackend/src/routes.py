@@ -511,3 +511,18 @@ def delete_budget():
     except Exception as e:
         print("SERVER ERROR:", traceback.format_exc())
         return jsonify({"error": str(e)}), 500
+
+
+@main_routes.route('/delete_account', methods=['POST'])
+def delete_account():
+    try:
+        data = request.get_json()
+
+        if delete_account_data(data["accountId"]):
+            return jsonify({"success": True, "msg": "Account deleted successfully"}), 201
+        
+        return jsonify({"success": False, "msg": "Something went wrong when deleting the data"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500

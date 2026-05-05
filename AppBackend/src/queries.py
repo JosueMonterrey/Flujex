@@ -344,6 +344,34 @@ def insert_new_account(user_id, currency_id, account_name, account_description):
     finally:
         cursor.close()
         conn.close()
+
+
+def delete_account_data(account_id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        query = """
+            UPDATE account
+            SET inactive_date = NOW()
+            WHERE account_id = %s
+        """
+
+        values = [account_id]
+        
+        cursor.execute(query, values)
+        conn.commit()
+        
+        return cursor.rowcount > 0
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        conn.rollback()
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
 #
 
 # TRANSACTIONS
