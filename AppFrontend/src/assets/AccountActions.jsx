@@ -151,7 +151,7 @@ export function AccountActions({ accountId }) {
                                     : subscriptions.length > 0
                                         ? subscriptions.map((sub) => (
                                             <button key={sub.subscription_id}
-                                                className="btn btn-light w-100 mb-2 text-start"
+                                                className="btn btn-light w-100 mb-2 d-flex justify-content-between align-items-center"
                                                 onClick={() => setEditSubscription(
                                                     {
                                                         "id": sub.subscription_id,
@@ -161,7 +161,8 @@ export function AccountActions({ accountId }) {
                                                         "amount": sub.amount
                                                     }
                                                 )}>
-                                                {sub.name}
+                                                <span>{sub.name}</span>
+                                                <span className="text-muted small">{sub.amount}/{sub.frequency[0]}</span>
                                             </button>
                                         ))
                                         : <p className="alert alert-info mt-3">No subscriptions</p>
