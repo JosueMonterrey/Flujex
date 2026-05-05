@@ -21,11 +21,11 @@ export function Navbar({ navbarContent }) {
                         <i className="bi bi-list"></i>
                     </Dropdown.Toggle>
                     <Dropdown.Menu>
-                        <Dropdown.Item>
+                        <Dropdown.Item onClick={() => navigate("/settings")}>
                             <i className="bi bi-gear me-2"></i>
                             Settings
                         </Dropdown.Item>
-                        <Dropdown.Item onClick={logout}>
+                        <Dropdown.Item onClick={(logout)}>
                             <i className="bi bi-box-arrow-left me-2"></i>
                             Log out
                         </Dropdown.Item>

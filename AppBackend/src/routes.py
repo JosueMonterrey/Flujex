@@ -78,6 +78,38 @@ def register():
         print("SERVER ERROR:", traceback.format_exc())
         return jsonify({"error": str(e)}), 500
     
+    
+@main_routes.route('/get_user', methods=['POST'])
+def get_user():
+    try:
+        data = request.get_json()
+
+        user = get_user_by_id(data["userId"])
+
+        if user is not None:
+            return jsonify({"success": True, "msg": "User data retrieved succesfully", "user" : user}), 201
+    
+        return jsonify({"success": False, "msg": "Could not find user data"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+
+@main_routes.route('/delete_user', methods=['POST'])
+def delete_user():
+    try:
+        data = request.get_json()
+
+        if delete_user_data(data["userId"]):
+            return jsonify({"success": True, "msg": "User deleted successfully"}), 201
+        
+        return jsonify({"success": False, "msg": "Something went wrong when deleting the data"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
 
 @main_routes.route('/create_account', methods=['POST'])
 def create_account():

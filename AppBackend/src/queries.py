@@ -49,6 +49,58 @@ def get_user_by_email(email):
         conn.close()
 
 
+def get_user_by_id(user_id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:        
+        query = """
+            SELECT *
+            FROM user
+            WHERE user_id = %s
+            AND inactive_date > NOW()
+        """
+        cursor.execute(query, [user_id])
+        user = cursor.fetchone()
+        return user
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        return None
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def delete_user_data(user_id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        query = """
+            UPDATE user
+            SET inactive_date = NOW()
+            WHERE user_id = %s
+        """
+
+        values = [user_id]
+        
+        cursor.execute(query, values)
+        conn.commit()
+        
+        return cursor.rowcount > 0
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        conn.rollback()
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
 def insert_new_user(data, hashed_pwd):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)

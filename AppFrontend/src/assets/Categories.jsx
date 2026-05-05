@@ -17,7 +17,6 @@ export function Categories() {
         const data = await getCategories();
 
         if (data) {
-            console.log(data)
             setCategories(data);
         }
 

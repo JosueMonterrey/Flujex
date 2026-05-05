@@ -8,7 +8,7 @@ CREATE TABLE user (
     first_name 		VARCHAR(50)		NOT NULL,
     last_name_1 	VARCHAR(50)		NOT NULL,
     last_name_2 	VARCHAR(50)		NOT NULL,
-    username 		VARCHAR(50)		NOT NULL 	UNIQUE,
+    username 		VARCHAR(50)		NOT NULL,
     hashed_pwd		VARCHAR(255)	NOT NULL,
     email 			VARCHAR(100)	NOT NULL,
     phone 			VARCHAR(20)		NOT NULL,

@@ -7,6 +7,7 @@ import { Home } from './assets/Home';
 import { AccountDashboard } from './assets/AccountDashboard';
 import { AccountTransactions } from './assets/AccountTransactions';
 import { Categories } from './assets/Categories';
+import { Settings } from './assets/Settings';
 
 import './App.css'
 
@@ -22,6 +23,7 @@ function App() {
 				<Route path="/account-dashboard/:id" element={<AccountDashboard />} />
 				<Route path="/account-transactions/:id" element={<AccountTransactions />} />
 				<Route path="/categories" element={<Categories />} />
+				<Route path="/settings" element={<Settings />} />
 			</Routes>
 		</Router>
 	);
