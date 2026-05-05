@@ -109,8 +109,8 @@ export function AccountTransactions() {
                 {
                     loading
                         ? <LoadingText />
-                        : <div className="position-relative flex-grow-1 p-5 overflow-y-auto d-flex flex-column align-items-center" >
-                            <div className="position-absolute" style={{ top: '10px', left: '10px' }}>
+                        : <div className="position-relative flex-fill ">
+                            <div className="position-absolute" style={{ bottom: '10px', left: '10px' }}>
                                 <label className="form-label text-muted small">Movement Category</label>
                                 <Dropdown>
                                     <Dropdown.Toggle variant="light">
@@ -126,67 +126,69 @@ export function AccountTransactions() {
                                     </Dropdown.Menu>
                                 </Dropdown>
                             </div>
-                            {
-                                transactions.length > 0
-                                    ? transactions.map((t) => (
-                                        <div key={t.transaction_id} className="w-100 d-flex flex-column align-items-center">
+                            <div className="p-5 h-100 overflow-y-auto d-flex flex-column align-items-center" >
+                                {
+                                    transactions.length > 0
+                                        ? transactions.map((t) => (
+                                            <div key={t.transaction_id} className="w-100 d-flex flex-column align-items-center">
 
-                                            <div className="separator border mb-3" style={{ width: '0px', height: '80px' }}></div>
+                                                <div className="separator border mb-3" style={{ width: '0px', height: '80px' }}></div>
 
-                                            <p className="text-muted small" >{t.transaction_date}</p>
+                                                <p className="text-muted small" >{t.transaction_date}</p>
 
-                                            <div className={
-                                                `pb-0 alert
+                                                <div className={
+                                                    `pb-0 alert
                                                         ${t.origin_id == id
-                                                    ? "alert-danger"
-                                                    : "alert-success"
-                                                }`
-                                            }
-                                                style={{
-                                                    width: '100%',
-                                                    maxWidth: '450px'
-                                                }} >
+                                                        ? "alert-danger"
+                                                        : "alert-success"
+                                                    }`
+                                                }
+                                                    style={{
+                                                        width: '100%',
+                                                        maxWidth: '450px'
+                                                    }} >
 
-                                                <div className="d-flex justify-content-between small" >
-                                                    <p>{t.type}</p>
-                                                    <p>{t.category_name == "[UNCATEGORIZED]" ? "" : t.category_name}</p>
-                                                </div>
+                                                    <div className="d-flex justify-content-between small" >
+                                                        <p>{t.type}</p>
+                                                        <p>{t.category_name == "[UNCATEGORIZED]" ? "" : t.category_name}</p>
+                                                    </div>
 
-                                                <div className="d-flex justify-content-between">
+                                                    <div className="d-flex justify-content-between">
+                                                        {
+                                                            t.type == "Transfer"
+                                                                ? t.origin_id == id
+                                                                    ? <Link to={`/account-dashboard/${t.destiny_id}`} className="alert-link">
+                                                                        <i className="bi bi-box-arrow-down me-3"></i>
+                                                                        {t.destiny_name}
+                                                                    </Link>
+                                                                    : <Link to={`/account-dashboard/${t.origin_id}`} className="alert-link">
+                                                                        <i className="bi bi-box-arrow-up me-3"></i>
+                                                                        {t.origin_name}
+                                                                    </Link>
+                                                                : ""
+                                                        }
+
+                                                        <p className="fw-medium">
+                                                            {
+                                                                t.type == "Expense" || (t.type == "Transfer" && t.origin_id == id)
+                                                                    ? `- ${t.origin_currency_symbol}${t.amount_origin}`
+                                                                    : `+ ${t.destiny_currency_symbol}${t.amount_destiny}`
+                                                            }
+                                                        </p>
+                                                    </div>
+
                                                     {
-                                                        t.type == "Transfer"
-                                                            ? t.origin_id == id
-                                                                ? <Link to={`/account-dashboard/${t.destiny_id}`} className="alert-link">
-                                                                    <i className="bi bi-box-arrow-down me-3"></i>
-                                                                    {t.destiny_name}
-                                                                </Link>
-                                                                : <Link to={`/account-dashboard/${t.origin_id}`} className="alert-link">
-                                                                    <i className="bi bi-box-arrow-up me-3"></i>
-                                                                    {t.origin_name}
-                                                                </Link>
+                                                        t.transaction_description
+                                                            ? <p className="small text-muted">{t.transaction_description}</p>
                                                             : ""
                                                     }
-
-                                                    <p className="fw-medium">
-                                                        {
-                                                            t.type == "Expense" || (t.type == "Transfer" && t.origin_id == id)
-                                                                ? `- ${t.origin_currency_symbol}${t.amount_origin}`
-                                                                : `+ ${t.destiny_currency_symbol}${t.amount_destiny}`
-                                                        }
-                                                    </p>
                                                 </div>
-
-                                                {
-                                                    t.transaction_description
-                                                        ? <p className="small text-muted">{t.transaction_description}</p>
-                                                        : ""
-                                                }
                                             </div>
-                                        </div>
-                                    ))
-                                    : <p className="alert alert-info" >No transactions found</p>
-                            }
-                            <div ref={scrollRef} />
+                                        ))
+                                        : <p className="alert alert-info" >No transactions found</p>
+                                }
+                                <div ref={scrollRef} />
+                            </div>
                         </div>
                 }
             </div>

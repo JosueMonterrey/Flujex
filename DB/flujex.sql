@@ -75,7 +75,7 @@ CREATE TABLE budget (
     inactive_date	TIMESTAMP		NOT NULL	DEFAULT '2038-01-01 00:00:00',
     
     CONSTRAINT 		fk_budget_acc		FOREIGN KEY (account_id)		REFERENCES account(account_id)		ON DELETE CASCADE,
-    UNIQUE KEY		budget_period(account_id, month, year)
+    UNIQUE KEY		budget_period(account_id, month, year, inactive_date)
 );
 
 -- 8. Tabla de tipo de cambio

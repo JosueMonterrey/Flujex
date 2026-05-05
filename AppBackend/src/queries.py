@@ -451,7 +451,7 @@ def get_transactions_in_time_interval(account_id, days=9999):
         conn.close()
 
 
-def insert_new_transaction(origin_acc_id, destiny_acc_id, category_id, mov_type, amount_origin, amount_destiny, rate_id, description):
+def insert_new_transaction(origin_acc_id, destiny_acc_id, category_id, mov_type, amount_origin, amount_destiny, rate_id, description, origin_budget_id):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
     
@@ -474,6 +474,12 @@ def insert_new_transaction(origin_acc_id, destiny_acc_id, category_id, mov_type,
             cursor.execute(
                 "UPDATE account SET balance = balance + %s WHERE account_id = %s",
                 [amount_destiny, destiny_acc_id]
+            )
+        
+        if origin_budget_id is not None:
+            cursor.execute(
+                "UPDATE budget SET current_spent = current_spent + %s WHERE budget_id = %s",
+                [amount_origin, origin_budget_id]
             )
 
         conn.commit()
@@ -889,6 +895,30 @@ def get_budget_by_date(account_id, month, year):
                 AND inactive_date > NOW()
         """
         cursor.execute(query, [account_id, month, year])
+        budget = cursor.fetchone()
+        return budget
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        return None
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def get_budget_by_id(account_id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:        
+        query = """
+            SELECT *
+            FROM budget
+            WHERE budget_id = %s
+                AND inactive_date > NOW()
+        """
+        cursor.execute(query, [account_id])
         budget = cursor.fetchone()
         return budget
     

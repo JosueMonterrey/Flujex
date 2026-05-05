@@ -5,6 +5,7 @@ import traceback
 import requests
 import os
 from dotenv import load_dotenv
+from datetime import date
 
 main_routes = Blueprint('main_routes', __name__)
 
@@ -350,7 +351,13 @@ def new_transaction():
         if data["movementType"] == "Deposit":
             amount_destiny = amount_origin
 
-        if insert_new_transaction(acc_origin["account_id"], acc_destiny["account_id"], category["category_id"], data["movementType"], amount_origin, amount_destiny, xchg_rate_origin["rate_id"], data["description"]):
+        origin_budget = get_budget_by_date(acc_origin["account_id"], date.today().month, date.today().year)
+        origin_budget_id = origin_budget["budget_id"] if origin_budget is not None else None
+
+        if origin_budget is not None and float(origin_budget["current_spent"]) + amount_origin > float(origin_budget["amount_limit"]):
+            return jsonify({"success": False, "msg": "Amount surpasses budget limit on origin account"}), 500
+
+        if insert_new_transaction(acc_origin["account_id"], acc_destiny["account_id"], category["category_id"], data["movementType"], amount_origin, amount_destiny, xchg_rate_origin["rate_id"], data["description"], origin_budget_id):
             return jsonify({"success": True, "msg": "Movement successful"}), 201
 
         return jsonify({"success": False, "msg": "Something went wrong when inserting into database"}), 500
@@ -476,6 +483,10 @@ def update_budget():
 
         if already_exists and already_exists["budget_id"] != data["editId"]:
             return jsonify({"success": False, "msg": "A budget already exists for that time period"}), 409
+        
+        all_data = get_budget_by_id(data["editId"])
+        if all_data is not None and all_data["current_spent"] > float(data["amount"]):
+            return jsonify({"success": False, "msg": "Budget limit cannot be less than current spent amount"}), 500    
         
         if update_budget_data(data["editId"], data["amount"], data["month"], data["year"]):
             return jsonify({"success": True, "msg": "Budget updated successfully"}), 201
