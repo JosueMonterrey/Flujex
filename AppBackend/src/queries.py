@@ -347,6 +347,58 @@ def insert_new_account(user_id, currency_id, account_name, account_description):
 #
 
 # TRANSACTIONS
+def get_account_transactions(account_id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:        
+        query = """
+            SELECT t.transaction_id,
+                t.type,
+                t.amount_origin,
+                t.amount_destiny,
+                t.description AS transaction_description,
+                t.transaction_date,
+                c.category_id,
+                c.name AS category_name,
+                c.description AS category_description,
+                x.rate_to_base,
+                a_orig.account_id AS origin_id,
+                a_orig.name AS origin_name,
+                orig_curr.symbol AS origin_currency_symbol,
+                a_dest.account_id AS destiny_id,
+                a_dest.name AS destiny_name,
+                dest_curr.symbol AS destiny_currency_symbol
+            FROM transaction AS t
+            JOIN category AS c
+                ON t.category_id = c.category_id
+            JOIN exchange_rate AS x
+                ON t.rate_id = x.rate_id
+            JOIN account AS a_orig
+                ON t.origin_acc_id = a_orig.account_id
+            JOIN currency AS orig_curr
+                ON a_orig.currency_id = orig_curr.currency_id
+            JOIN account AS a_dest
+                ON t.destiny_acc_id = a_dest.account_id
+            JOIN currency AS dest_curr
+                ON a_dest.currency_id = dest_curr.currency_id
+            WHERE t.origin_acc_id = %s
+                OR t.destiny_acc_id = %s
+            ORDER BY t.transaction_date
+        """
+        cursor.execute(query, [account_id, account_id])
+        transactions = cursor.fetchall()
+        return transactions
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        return None
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
 def get_transactions_out_time_interval(account_id, days=9999):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
@@ -439,6 +491,94 @@ def insert_new_transaction(origin_acc_id, destiny_acc_id, category_id, mov_type,
 #
 
 # CATEGORIES
+def get_categories_by_user(user_id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:        
+        query = """
+            SELECT *
+            FROM category
+            WHERE user_id = %s
+                AND inactive_date > NOW()
+                AND NOT name = '[UNCATEGORIZED]'
+        """
+        cursor.execute(query, [user_id])
+        category = cursor.fetchall()
+        return category
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        return None
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def update_category_data(category_id, name, description, R, G, B, type_allowed):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        query = """
+            UPDATE category
+            SET name = %s,
+                description = %s,
+                color_r = %s,
+                color_g = %s,
+                color_b = %s,
+                type_allowed = %s
+            WHERE category_id = %s
+        """
+
+        values = [name, description, R, G, B, type_allowed, category_id]
+        
+        cursor.execute(query, values)
+        conn.commit()
+        
+        return True
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        conn.rollback()
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def delete_category_data(user_id, category_id, name):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        query = """
+            UPDATE category
+            SET inactive_date = NOW()
+            WHERE user_id = %s
+                AND category_id = %s
+                AND name = %s
+        """
+
+        values = [user_id, category_id, name]
+        
+        cursor.execute(query, values)
+        conn.commit()
+        
+        return cursor.rowcount > 0
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        conn.rollback()
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
 def get_categories_by_user_and_multiple_type(user_id, type_allowed_1, type_allowed_2):
     conn = get_connection()
     cursor = conn.cursor(dictionary=True)
@@ -574,3 +714,138 @@ def get_most_spent_categories_time_interval(account_id, days=9999):
         cursor.close()
         conn.close()
 #
+
+
+# SUBSCRIPTION
+def get_subscription_by_name(account_id, subscription_name):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:        
+        query = """
+            SELECT *
+            FROM subscription
+            WHERE account_id = %s AND name = %s AND inactive_date > NOW()
+        """
+        cursor.execute(query, [account_id, subscription_name])
+        subscription = cursor.fetchone()
+        return subscription
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        return None
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def get_subscriptions_by_account(account_id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:        
+        query = """
+            SELECT *
+            FROM subscription
+            WHERE account_id = %s AND inactive_date > NOW()
+        """
+        cursor.execute(query, [account_id])
+        subscription = cursor.fetchall()
+        return subscription
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        return None
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def insert_new_subscription(account_id, name, amount, frequency, start_date):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        query = """
+            INSERT INTO subscription (account_id, name, amount, frequency, start_date, next_date)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """
+
+        values = [account_id, name, amount, frequency, start_date, start_date]
+        
+        cursor.execute(query, values)
+        conn.commit()
+        
+        return cursor.rowcount > 0
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        conn.rollback()
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def update_subscription_data(subscription_id, name, frequency, amount):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        query = """
+            UPDATE subscription
+            SET name = %s,
+                frequency = %s,
+                amount = %s
+            WHERE subscription_id = %s
+        """
+
+        values = [name, frequency, amount, subscription_id]
+        
+        cursor.execute(query, values)
+        conn.commit()
+        
+        return True
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        conn.rollback()
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def delete_subscription_data(account_id, subcription_id, name):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        query = """
+            UPDATE subscription
+            SET inactive_date = NOW()
+            WHERE account_id = %s
+                AND subscription_id = %s
+                AND name = %s
+        """
+
+        values = [account_id, subcription_id, name]
+        
+        cursor.execute(query, values)
+        conn.commit()
+        
+        return cursor.rowcount > 0
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        conn.rollback()
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
+

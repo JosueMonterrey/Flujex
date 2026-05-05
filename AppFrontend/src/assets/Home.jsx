@@ -3,7 +3,7 @@ import { Navbar } from './Navbar';
 import { NewAccount } from './NewAccount';
 import { SearchBar } from './SearchBar';
 import { AccountCard } from './AccountCard';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { LoadingText } from './LoadingText';
 import { NewTransaction } from './NewTransaction';
@@ -96,6 +96,10 @@ export function Home() {
 				<>
 					<SearchBar placeholder="Search accounts" onSearch={(s) => searchAccounts(s)} />
 					<NewAccount onCreateSuccessful={fetchAndSetAccounts} />
+					<Link to={"/categories"} className="btn btn-primary d-flex align-items-center">
+						Manage Categories
+						<i className="bi bi-tag ms-2"></i>
+					</Link>
 				</>
 			} />
 

@@ -1,8 +1,6 @@
 import { API_URL } from '../config';
 import { useEffect, useState } from 'react';
 import { Dropdown, Modal } from 'react-bootstrap';
-import { AccountList } from './AccountList';
-import { CategoryList } from './CategoryList';
 
 export function NewTransaction({ onCreateSuccessful }) {
 
@@ -118,13 +116,13 @@ export function NewTransaction({ onCreateSuccessful }) {
             if (!userId)
                 return setCreationError("You are not logged in.");
 
-            const response = await fetch(`${API_URL}/get_categories`, {
+            const response = await fetch(`${API_URL}/get_categories_by_type`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     userId,
                     movementType
-                 })
+                })
             });
 
             const data = await response.json();

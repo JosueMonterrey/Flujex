@@ -54,9 +54,9 @@ CREATE TABLE category (
     user_id         INT									NOT NULL,
     name			VARCHAR(50)							NOT NULL,
     description		VARCHAR(255)						NOT NULL,
-    color_r			TINYINT								NOT NULL	DEFAULT 0,
-    color_g			TINYINT								NOT NULL	DEFAULT 0,
-    color_b			TINYINT								NOT NULL	DEFAULT 0,
+    color_r			TINYINT                             UNSIGNED    NOT NULL    DEFAULT 0,
+    color_g			TINYINT                             UNSIGNED    NOT NULL    DEFAULT 0,
+    color_b			TINYINT                             UNSIGNED    NOT NULL    DEFAULT 0,
     type_allowed	ENUM('Deposit', 'Expense', 'Both')	NOT NULL	DEFAULT 'Both',
     inactive_date	TIMESTAMP							NOT NULL	DEFAULT '2038-01-01 00:00:00',
     	
@@ -150,6 +150,7 @@ CREATE TABLE external_source (
 CREATE TABLE subscription (
 	subscription_id		INT												PRIMARY KEY AUTO_INCREMENT,
 	account_id			INT												NOT NULL,
+    name                VARCHAR(50)                                     NOT NULL,
 	amount				DECIMAL(12, 2)									NOT NULL,
 	start_date			DATE											NOT NULL	DEFAULT (CURRENT_DATE),
 	next_date			DATE											NOT NULL	DEFAULT (CURRENT_DATE),

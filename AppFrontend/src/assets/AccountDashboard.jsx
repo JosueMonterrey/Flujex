@@ -157,7 +157,7 @@ export function AccountDashboard() {
                 <HomeButton />
             } />
             <div className="d-flex h-100 overflow-hidden">
-                <AccountActions account_id={id} />
+                <AccountActions accountId={id} />
                 {
                     loading
                         ? <LoadingText />

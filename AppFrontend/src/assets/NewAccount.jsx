@@ -104,7 +104,7 @@ export function NewAccount({ onCreateSuccessful }) {
 
     return (
         <>
-            <button className="btn btn-primary mx-4 d-flex align-items-center"
+            <button className="btn btn-primary d-flex align-items-center"
                 onClick={() => {
                     resetForm();
                     setShowModal(true);

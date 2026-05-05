@@ -194,3 +194,5 @@ SELECT `code`, `name`, `font_code2000`
 FROM `currencies_external_db`
 WHERE `name` IS NOT NULL
 	AND `font_code2000` IS NOT NULL;
+
+DROP TABLE `currencies_external_db`;
