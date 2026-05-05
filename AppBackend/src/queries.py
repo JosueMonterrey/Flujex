@@ -849,3 +849,140 @@ def delete_subscription_data(account_id, subcription_id, name):
         cursor.close()
         conn.close()
 
+
+# BUDGET
+def get_budgets_by_account(account_id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:        
+        query = """
+            SELECT *
+            FROM budget
+            WHERE account_id = %s AND inactive_date > NOW()
+            ORDER BY year, month
+        """
+        cursor.execute(query, [account_id])
+        budgets = cursor.fetchall()
+        return budgets
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        return None
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def get_budget_by_date(account_id, month, year):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:        
+        query = """
+            SELECT *
+            FROM budget
+            WHERE account_id = %s
+                AND month = %s
+                AND year = %s
+                AND inactive_date > NOW()
+        """
+        cursor.execute(query, [account_id, month, year])
+        budget = cursor.fetchone()
+        return budget
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        return None
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def insert_new_budget(account_id, amount_limit, month, year):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        query = """
+            INSERT INTO budget (account_id, amount_limit, month, year)
+            VALUES (%s, %s, %s, %s)
+        """
+
+        values = [account_id, amount_limit, month, year]
+        
+        cursor.execute(query, values)
+        conn.commit()
+        
+        return cursor.rowcount > 0
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        conn.rollback()
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def update_budget_data(budget_id, amount_limit, month, year):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        query = """
+            UPDATE budget
+            SET amount_limit = %s,
+                month = %s,
+                year = %s
+            WHERE budget_id = %s
+        """
+
+        values = [amount_limit, month, year, budget_id]
+        
+        cursor.execute(query, values)
+        conn.commit()
+        
+        return True
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        conn.rollback()
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def delete_budget_data(account_id, budget_id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        query = """
+            UPDATE budget
+            SET inactive_date = NOW()
+            WHERE account_id = %s
+                AND budget_id = %s
+        """
+
+        values = [account_id, budget_id]
+        
+        cursor.execute(query, values)
+        conn.commit()
+        
+        return cursor.rowcount > 0
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        conn.rollback()
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
+

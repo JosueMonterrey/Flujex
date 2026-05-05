@@ -428,3 +428,75 @@ def delete_subscription():
     except Exception as e:
         print("SERVER ERROR:", traceback.format_exc())
         return jsonify({"error": str(e)}), 500
+
+
+@main_routes.route('/create_budget', methods=['POST'])
+def create_budget():
+    try:
+        data = request.get_json()
+
+        already_exists = get_budget_by_date(data["accountId"], data["month"], data["year"])
+
+        if already_exists:
+            return jsonify({"success": False, "msg": "A budget already exists for that time period"}), 409
+
+        if insert_new_budget(data["accountId"], data["amount"], data["month"], data["year"]):
+            return jsonify({"success": True, "msg": "Budget created successfully"}), 201
+        
+        return jsonify({"success": False, "msg": "Something went wrong when inserting into database"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+    
+
+@main_routes.route('/get_budgets', methods=['POST'])
+def get_budgets():
+    try:
+        data = request.get_json()
+
+        budgets = get_budgets_by_account(data["accountId"])
+
+        if budgets is not None:
+            return jsonify({"success": True, "msg": "Budgets retrieved successfully", "budgets": budgets}), 201
+        
+        return jsonify({"success": False, "msg": "Failed to get budgets"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+
+@main_routes.route('/update_budget', methods=['POST'])
+def update_budget():
+    try:
+        data = request.get_json()
+
+        already_exists = get_budget_by_date(data["accountId"], data["month"], data["year"])
+
+        if already_exists and already_exists["budget_id"] != data["editId"]:
+            return jsonify({"success": False, "msg": "A budget already exists for that time period"}), 409
+        
+        if update_budget_data(data["editId"], data["amount"], data["month"], data["year"]):
+            return jsonify({"success": True, "msg": "Budget updated successfully"}), 201
+        
+        return jsonify({"success": False, "msg": "Something went wrong when updating the data"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+
+@main_routes.route('/delete_budget', methods=['POST'])
+def delete_budget():
+    try:
+        data = request.get_json()
+
+        if delete_budget_data(data["accountId"], data["editId"]):
+            return jsonify({"success": True, "msg": "Budget deleted successfully"}), 201
+        
+        return jsonify({"success": False, "msg": "Something went wrong when deleting the data"}), 500
+
+    except Exception as e:
+        print("SERVER ERROR:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
