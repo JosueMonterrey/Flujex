@@ -308,7 +308,7 @@ def get_most_spent_categories():
 @main_routes.route('/new_transaction', methods=['POST'])
 def new_transaction():
     data = request.get_json()
-    new_transaction_internal(data)
+    return new_transaction_internal(data)
 
 def new_transaction_internal(data):
     try:

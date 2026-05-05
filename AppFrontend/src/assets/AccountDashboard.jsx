@@ -20,6 +20,11 @@ export function AccountDashboard() {
     const { id } = useParams();
     const navigate = useNavigate();
 
+    const rgbToHex = (r, g, b) => {
+        const toHex = (n) => n.toString(16).padStart(2, '0');
+        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    };
+
     const popoverRef = useRef(null);
     useEffect(() => {
         loadPopover();
@@ -249,36 +254,55 @@ export function AccountDashboard() {
                                 </div>
 
                                 <div className="d-flex gap-3">
-                                    <div className="bg-light rounded px-3 pt-3 w-50">
+                                    <div className="bg-light rounded p-3 w-50">
                                         <p className="text-muted">Most spent categories:</p>
                                         {
                                             mostSpentCategories.length > 0
-                                                ? <ol>
-                                                    {
-                                                        mostSpentCategories.map((category) => <li key={category["category_id"]}>
-                                                            <p>{category["name"]}:
-                                                                <span className="fw-light text-muted">
-                                                                    ({category["amount_transactions"]}) {category["total_out"]}
-                                                                </span>
-                                                            </p>
-                                                        </li>)
-                                                    }
-                                                </ol>
+                                                ? mostSpentCategories.slice(0, 5).map((category) =>
+                                                    <div key={category["category_id"]} className="d-flex align-items-center gap-2">
+                                                        <div style={{
+                                                            width: '5px',
+                                                            height: '15px',
+                                                            backgroundColor: rgbToHex(parseInt(category["color_r"]), parseInt(category["color_g"]), parseInt(category["color_b"]))
+                                                        }}
+                                                            className="rounded"></div>
+                                                        <span>
+                                                            {
+                                                                category["name"] == "[UNCATEGORIZED]"
+                                                                    ? <span className="fst-italic">No category</span>
+                                                                    : category["name"]
+                                                            }
+                                                        </span>
+                                                        <span> ({category["amount_transactions"]}): </span>
+                                                        <span className="fw-light text-muted"> {account["symbol"]}{category["total_out"]}</span>
+                                                    </div>
+                                                )
                                                 : <p className="alert alert-light" >No data</p>
                                         }
                                     </div>
-                                    <div className="bg-light rounded px-3 pt-3 w-50">
+                                    <div className="bg-light rounded p-3 w-50">
                                         <p className="text-muted">Least spent categories:</p>
                                         {
                                             mostSpentCategories.length > 0
-                                                ? <ol>
-                                                    {
-                                                        mostSpentCategories.map((category) => <li key={category["category_id"]}>
-                                                            <p> {category["name"]} {category["total_out"]}
-                                                            </p>
-                                                        </li>)
-                                                    }
-                                                </ol>
+                                                ? mostSpentCategories.toReversed().slice(0, 5).map((category) =>
+                                                    <div key={category["category_id"]} className="d-flex align-items-center gap-2">
+                                                        <div style={{
+                                                            width: '5px',
+                                                            height: '15px',
+                                                            backgroundColor: rgbToHex(parseInt(category["color_r"]), parseInt(category["color_g"]), parseInt(category["color_b"]))
+                                                        }}
+                                                            className="rounded"></div>
+                                                        <span>
+                                                            {
+                                                                category["name"] == "[UNCATEGORIZED]"
+                                                                    ? <span className="fst-italic">No category</span>
+                                                                    : category["name"]
+                                                            }
+                                                        </span>
+                                                        <span> ({category["amount_transactions"]}): </span>
+                                                        <span className="fw-light text-muted"> {account["symbol"]}{category["total_out"]}</span>
+                                                    </div>
+                                                )
                                                 : <p className="alert alert-light" >No data</p>
                                         }
                                     </div>

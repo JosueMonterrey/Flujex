@@ -728,6 +728,9 @@ def get_most_spent_categories_time_interval(account_id, days=9999):
             SELECT
                 t.category_id,
                 c.name,
+                c.color_r,
+                c.color_g,
+                c.color_b,
                 IFNULL(COUNT(t.transaction_id), 0) AS amount_transactions,
                 IFNULL(SUM(t.amount_origin), 0) AS total_out
             FROM transaction AS t
