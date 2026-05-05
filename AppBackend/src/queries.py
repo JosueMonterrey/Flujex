@@ -886,6 +886,41 @@ def delete_subscription_data(account_id, subcription_id, name):
         conn.close()
 
 
+def charge_subscription(subscription_id, account_id, name, amount, next_date, frequency):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        query = """
+            UPDATE subscription
+            SET next_date = CASE 
+                    WHEN frequency = 'Daily'    THEN DATE_ADD(next_date, INTERVAL 1 DAY)
+                    WHEN frequency = 'Weekly'   THEN DATE_ADD(next_date, INTERVAL 1 WEEK)
+                    WHEN frequency = 'Monthly'  THEN DATE_ADD(next_date, INTERVAL 1 MONTH)
+                    WHEN frequency = 'Annually' THEN DATE_ADD(next_date, INTERVAL 1 YEAR)
+                    ELSE next_date
+                END
+            WHERE subscription_id = %s 
+                AND inactive_date > NOW();
+        """
+
+        values = [subscription_id]
+        
+        cursor.execute(query, values)
+        conn.commit()
+        
+        return True
+    
+    except Exception as e:
+        print("QUERY ERROR: " + str(e))
+        conn.rollback()
+        return False
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+
 # BUDGET
 def get_budgets_by_account(account_id):
     conn = get_connection()

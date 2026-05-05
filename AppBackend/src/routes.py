@@ -16,14 +16,35 @@ def login():
 
         user = get_user_by_username(data['username'])
         
-        if user != None:
-            password_bytes = data['password'].encode('utf-8')
-            hash_bytes = user['hashed_pwd'].encode('utf-8')
-
-            if bcrypt.checkpw(password_bytes, hash_bytes):
-                return jsonify({"success": True, "user_id" : user['user_id'], "msg": "Login completed"}), 200
+        if user is None:
+            return jsonify({"success": False, "msg": "Wrong username or password"}), 401
         
-        return jsonify({"success": False, "msg": "Wrong username or password"}), 401
+        password_bytes = data['password'].encode('utf-8')
+        hash_bytes = user['hashed_pwd'].encode('utf-8')
+
+        if not bcrypt.checkpw(password_bytes, hash_bytes):
+            return jsonify({"success": False, "msg": "Wrong username or password"}), 401
+        
+        # HANDLE SUBSCRIPTIONS
+        user_accounts = get_accounts_by_user(user["user_id"])
+        for acc in user_accounts:
+            subscriptions = get_subscriptions_by_account(acc["account_id"])
+            for sub in subscriptions:
+                if sub["next_date"] <= date.today():
+                    a = {
+                        "userId" : user["user_id"],
+                        "accountOrigin" : acc,
+                        "accountDestiny" : None,
+                        "category" : None,
+                        "movementType" : "Expense",
+                        "amount" : sub["amount"],
+                        "description" : f"Automatic payment: {sub["name"]}" 
+                    }
+                    new_transaction_internal(a)
+                    charge_subscription(sub["subscription_id"], sub["account_id"], sub["name"], sub["amount"], sub["next_date"], sub["frequency"])
+
+        return jsonify({"success": True, "user_id" : user['user_id'], "msg": "Login completed"}), 200
+        
     except Exception as e:
         print("SERVER ERROR:", traceback.format_exc())
         return jsonify({"error": str(e)}), 500
@@ -286,9 +307,11 @@ def get_most_spent_categories():
 
 @main_routes.route('/new_transaction', methods=['POST'])
 def new_transaction():
-    try:
-        data = request.get_json()
+    data = request.get_json()
+    new_transaction_internal(data)
 
+def new_transaction_internal(data):
+    try:
         acc_origin = data["accountOrigin"]
         acc_destiny = data["accountDestiny"]
         category = data["category"]
