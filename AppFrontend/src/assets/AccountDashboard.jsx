@@ -186,7 +186,7 @@ export function AccountDashboard() {
                 <Navbar navbarContent={
                     <HomeButton />
                 } />
-                <div className="d-flex h-100 overflow-hidden">
+                <div id="account-dashboard" className="d-flex h-100 overflow-hidden">
                     <AccountActions accountId={id} />
                     {
                         loading
@@ -222,7 +222,7 @@ export function AccountDashboard() {
                                         </Dropdown.Menu>
                                     </Dropdown>
 
-                                    <div className="d-flex text-center justify-content-between mt-3">
+                                    <div className="net-transactions d-flex text-center justify-content-between mt-3">
                                         <div className="in w-25">
                                             <p className="text-muted fw-bold border-bottom">In</p>
                                             <p className="fw-light text-muted">
@@ -253,7 +253,7 @@ export function AccountDashboard() {
                                     </div>
                                 </div>
 
-                                <div className="d-flex gap-3">
+                                <div id="most-spent" className="d-flex gap-3">
                                     <div className="bg-light rounded p-3 w-50">
                                         <p className="text-muted">Most spent categories:</p>
                                         {

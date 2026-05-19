@@ -216,7 +216,7 @@ export function NewBudget({ onCreateSuccessful, accountId, editMode }) {
             </button>
 
             <Modal show={showModal} backdrop="static" keyboard={false} centered >
-                <form className='container p-5'>
+                <form id='new-budget-form' className='container p-5'>
                     <p className="text-body-secondary fs-3 fw-bold mb-5">
                         {isEditMode ? "Edit Budget" : "New Budget"}
                     </p>

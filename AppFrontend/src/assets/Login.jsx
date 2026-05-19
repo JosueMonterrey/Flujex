@@ -41,7 +41,7 @@ export function Login() {
     };
 
     return (
-        <div className="d-flex justify-content-center align-items-center min-vh-100">
+        <div id="login-form" className="d-flex justify-content-center align-items-center min-vh-100">
             <form className="text-center px-5 pt-5 pb-4 bg-body-tertiary rounded shadow-sm" onSubmit={submitLogin} noValidate >
                 <h1 className="text-body-secondary fw-bold mb-5">
                     Login to

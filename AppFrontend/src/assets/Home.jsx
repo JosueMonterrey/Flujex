@@ -91,42 +91,43 @@ export function Home() {
 	}
 
 	return (
-		<div className="d-flex flex-column " style={{ height: '100vh' }}>
-			<Navbar navbarContent={
-				<>
-					<SearchBar placeholder="Search accounts" onSearch={(s) => searchAccounts(s)} />
-					<NewAccount onCreateSuccessful={fetchAndSetAccounts} />
-					<Link to={"/categories"} className="btn btn-primary d-flex align-items-center">
-						Manage Categories
-						<i className="bi bi-tag ms-2"></i>
-					</Link>
-				</>
-			} />
-
-			<div className="position-absolute" ref={popoverRef} style={{
+		<>
+			<div id='new-transaction-btn' className="position-absolute" ref={popoverRef} style={{
 				right: '45px',
 				bottom: '35px'
 			}}>
 				<NewTransaction onCreateSuccessful={fetchAndSetAccounts} />
 			</div>
+			<div className="d-flex flex-column " style={{ height: '100vh' }}>
+				<Navbar navbarContent={
+					<>
+						<SearchBar placeholder="Search accounts" onSearch={(s) => searchAccounts(s)} />
+						<NewAccount onCreateSuccessful={fetchAndSetAccounts} />
+						<Link to={"/categories"} className="btn btn-primary d-flex align-items-center">
+							Manage Categories
+							<i className="bi bi-tag ms-2"></i>
+						</Link>
+					</>
+				} />
 
-			<div className="p-5 overflow-y-auto d-flex flex-wrap">
-				{
-					loading
-						? <LoadingText />
-						: accounts.length > 0
-							? accounts.map((account) => (account.account_name == "[SYSTEM_ORIGIN]" || account.account_name == "[SYSTEM_DESTINY]")
-								? ""
-								: <AccountCard
-									key={account.account_id}
-									id={account.account_id}
-									name={account.account_name}
-									balance={account.balance}
-									description={account.description}
-									currencySymbol={account.symbol} />)
-							: <p className="alert alert-info">No accounts found.</p>
-				}
+				<div id='account-card-list' className="p-5 overflow-y-auto d-flex flex-wrap">
+					{
+						loading
+							? <LoadingText />
+							: accounts.length > 0
+								? accounts.map((account) => (account.account_name == "[SYSTEM_ORIGIN]" || account.account_name == "[SYSTEM_DESTINY]")
+									? ""
+									: <AccountCard
+										key={account.account_id}
+										id={account.account_id}
+										name={account.account_name}
+										balance={account.balance}
+										description={account.description}
+										currencySymbol={account.symbol} />)
+								: <p className="alert alert-info">No accounts found.</p>
+					}
+				</div>
 			</div>
-		</div>
+		</>
 	);
 }

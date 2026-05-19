@@ -120,7 +120,7 @@ export function Register() {
 
     return (
 		<>
-			<div className="d-flex justify-content-center align-items-center min-vh-100">
+			<div id='register-form' className="d-flex justify-content-center align-items-center min-vh-100">
 				<form className="text-center px-5 pt-5 bg-body-tertiary rounded shadow-sm" onSubmit={submitRegister} noValidate>
 					<h1 className="text-body-secondary fw-bold mb-4">
 						Create an
@@ -177,7 +177,7 @@ export function Register() {
 						<span className="input-group-text">@</span>
 						<div className="form-floating">
 							<input type="text"
-								className={`form-control ${isValidUsername ? '' : 'is-invalid'}`}
+								className={`form-control rounded-end ${isValidUsername ? '' : 'is-invalid'}`}
 								id="inputUsername"
 								placeholder="Username"
 								maxLength={50}

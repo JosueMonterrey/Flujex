@@ -25,7 +25,11 @@ export function AccountTransactions() {
 
     useEffect(() => {
         if (scrollRef.current) {
-            scrollRef.current.scrollIntoView({ behavior: 'instant' });
+            scrollRef.current.scrollIntoView({
+                behavior: 'instant',
+                block: "nearest",
+                inline: "nearest"
+            });
         }
     }, [transactions])
 
@@ -104,29 +108,13 @@ export function AccountTransactions() {
             <Navbar navbarContent={
                 <HomeButton />
             } />
-            <div className="d-flex h-100 overflow-hidden">
+            <div id="account-transactions" className="d-flex h-100 overflow-hidden">
                 <AccountActions accountId={id} />
                 {
                     loading
                         ? <LoadingText />
-                        : <div className="position-relative flex-fill ">
-                            <div className="position-absolute" style={{ bottom: '10px', left: '10px' }}>
-                                <label className="form-label text-muted small">Movement Category</label>
-                                <Dropdown>
-                                    <Dropdown.Toggle variant="light">
-                                        {category == null ? "All" : category["name"]}
-                                    </Dropdown.Toggle>
-                                    <Dropdown.Menu>
-                                        <Dropdown.Item key={-1} onClick={() => setCategory(null)} className='fst-italic'>No category</Dropdown.Item>
-                                        {
-                                            categories.map((cat) => (
-                                                <Dropdown.Item key={cat.category_id} onClick={() => setCategory(cat)}>{cat.name}</Dropdown.Item>
-                                            ))
-                                        }
-                                    </Dropdown.Menu>
-                                </Dropdown>
-                            </div>
-                            <div className="p-5 h-100 overflow-y-auto d-flex flex-column align-items-center" >
+                        : <div className="content flex-grow-1 d-flex flex-column">
+                            <div className="transactions-list p-5 overflow-y-auto d-flex flex-column align-items-center flex-grow-1" >
                                 {
                                     transactions.length > 0
                                         ? transactions.map((t) => (
@@ -137,11 +125,12 @@ export function AccountTransactions() {
                                                 <p className="text-muted small" >{t.transaction_date}</p>
 
                                                 <div className={
-                                                    `pb-0 alert
+                                                    `transaction-card pb-0 alert
                                                         ${t.origin_id == id
                                                         ? "alert-danger"
                                                         : "alert-success"
                                                     }`
+
                                                 }
                                                     style={{
                                                         width: '100%',
@@ -153,7 +142,7 @@ export function AccountTransactions() {
                                                         <p>{t.category_name == "[UNCATEGORIZED]" ? "" : t.category_name}</p>
                                                     </div>
 
-                                                    <div className="d-flex justify-content-between">
+                                                    <div className="d-flex justify-content-between flex-wrap gap-3">
                                                         {
                                                             t.type == "Transfer"
                                                                 ? t.origin_id == id
@@ -206,6 +195,22 @@ export function AccountTransactions() {
                                         : <p className="alert alert-info" >No transactions found</p>
                                 }
                                 <div ref={scrollRef} />
+                            </div>
+                            <div className="filter p-3 border-top">
+                                <label className="form-label text-muted small">Movement Category</label>
+                                <Dropdown>
+                                    <Dropdown.Toggle variant="light">
+                                        {category == null ? "All" : category["name"]}
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item key={-1} onClick={() => setCategory(null)} className='fst-italic'>No category</Dropdown.Item>
+                                        {
+                                            categories.map((cat) => (
+                                                <Dropdown.Item key={cat.category_id} onClick={() => setCategory(cat)}>{cat.name}</Dropdown.Item>
+                                            ))
+                                        }
+                                    </Dropdown.Menu>
+                                </Dropdown>
                             </div>
                         </div>
                 }

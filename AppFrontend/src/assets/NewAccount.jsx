@@ -114,7 +114,7 @@ export function NewAccount({ onCreateSuccessful }) {
             </button>
 
             <Modal show={showModal} backdrop="static" keyboard={false} centered >
-                <form className='container p-5'>
+                <form id='new-account-form' className='container p-5'>
                     <p className="text-body-secondary fs-3 fw-bold mb-5">New Account</p>
 
                     <div className="row mb-3">

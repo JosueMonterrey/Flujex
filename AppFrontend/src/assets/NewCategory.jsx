@@ -217,7 +217,7 @@ export function NewCategory({ onCreateSuccessful, editMode }) {
             </button>
 
             <Modal show={showModal} backdrop="static" keyboard={false} centered >
-                <form className='container p-5'>
+                <form id='new-category-form' className='container p-5'>
                     <div className="d-flex justify-content-between">
                         <p className="text-body-secondary fs-3 fw-bold mb-5">
                             {

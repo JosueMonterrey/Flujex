@@ -230,7 +230,7 @@ export function NewSubscription({ onCreateSuccessful, accountId, editMode }) {
             </button>
 
             <Modal show={showModal} backdrop="static" keyboard={false} centered >
-                <form className='container p-5'>
+                <form id='new-subscription-form' className='container p-5'>
                     <p className="text-body-secondary fs-3 fw-bold mb-5">
                         {isEditMode ? "Edit Subscription" : "New Subscription"}
                     </p>
@@ -245,7 +245,7 @@ export function NewSubscription({ onCreateSuccessful, accountId, editMode }) {
                                 value={name}
                                 onChange={(e) => checkNameValid(e.target.value.trim())}
                             />
-                            <label htmlFor="accountNameInput" className='px-4'>Subscription Name</label>
+                            <label htmlFor="accountNameInput" className='px-4'>Name</label>
                         </div>
                         <Dropdown className='col'>
                             <Dropdown.Toggle variant="light" className='text-start w-100 h-100'>

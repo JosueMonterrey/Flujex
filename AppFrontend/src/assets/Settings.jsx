@@ -87,13 +87,13 @@ export function Settings() {
 		<div className="d-flex flex-column " style={{ height: '100vh' }}>
 			<Navbar navbarContent={<HomeButton />} />
 
-			<div className="p-5 overflow-y-auto d-flex flex-wrap">
+			<div id='settings' className="p-5 overflow-y-auto d-flex flex-wrap">
 				{
 					loading
 						? <LoadingText />
-						: <>
-							<div className='d-flex flex-wrap gap-3 flex-fill mb-4'>
-								<div className='p-3 rounded bg-light' style={{ width: '48%', minWidth: '400px' }}>
+						: <div>
+							<div className='settings-container d-flex flex-wrap gap-3 flex-fill mb-4'>
+								<div className='p-3 rounded bg-light' >
 									<p className="small text-muted ">Name</p>
 									<div className='d-flex gap-3'>
 										<p className='bg-secondary-subtle p-3 m-0 rounded'>{user["first_name"]}</p>
@@ -101,15 +101,15 @@ export function Settings() {
 										<p className='bg-secondary-subtle p-3 m-0 rounded'>{user["last_name_2"]}</p>
 									</div>
 								</div>
-								<div className='p-3 rounded bg-light' style={{ width: '48%', minWidth: '400px' }}>
+								<div className='p-3 rounded bg-light' >
 									<p className="small text-muted ">Username</p>
 									<p className='bg-secondary-subtle p-3 m-0 rounded'>{user["username"]}</p>
 								</div>
-								<div className='p-3 rounded bg-light' style={{ width: '48%', minWidth: '400px' }}>
+								<div className='p-3 rounded bg-light' >
 									<p className="small text-muted ">Email</p>
 									<p className='bg-secondary-subtle p-3 m-0 rounded'>{user["email"]}</p>
 								</div>
-								<div className='p-3 rounded bg-light' style={{ width: '48%', minWidth: '400px' }}>
+								<div className='p-3 rounded bg-light' >
 									<p className="small text-muted ">Joined</p>
 									<p className='bg-secondary-subtle p-3 m-0 rounded'>{user["signup_date"]}</p>
 								</div>
@@ -136,7 +136,7 @@ export function Settings() {
 									</div>
 								</div>
 							</Modal>
-						</>
+						</div>
 				}
 			</div>
 		</div>

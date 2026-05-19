@@ -11,7 +11,7 @@ export function Navbar({ navbarContent }) {
     }
 
     return (
-        <div className="navbar w-100 p-2 border-bottom">
+        <div id='navbar' className="navbar w-100 p-2 border-bottom">
             <div className="content px-4 py-1 d-flex flex-fill align-items-center gap-4">
                 {navbarContent}
             </div>

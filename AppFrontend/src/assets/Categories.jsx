@@ -59,7 +59,7 @@ export function Categories() {
                 <HomeButton />
             } />
 
-            <div className="pt-5 ps-4 flex-fill d-flex flex-column">
+            <div id="categories" className="pt-5 ps-4 flex-fill d-flex flex-column">
                 <div><NewCategory onCreateSuccessful={fetchAndSetCategories} editMode={editCategory} /></div>
 
                 <div className="list mt-4 pe-5 flex-fill overflow-y-auto" style={{height: '100px'}}>
@@ -69,7 +69,7 @@ export function Categories() {
                             : categories.length > 0
                                 ? categories.map((cat) => (
                                     <div key={cat.category_id}
-                                        className="d-flex align-items-center justify-content-between py-2"
+                                        className="category-card d-flex align-items-center justify-content-between py-2"
                                         style={{
                                             minHeight: '80px',
                                             borderLeftColor: `rgb(${cat.color_r}, ${cat.color_g}, ${cat.color_b})`,
