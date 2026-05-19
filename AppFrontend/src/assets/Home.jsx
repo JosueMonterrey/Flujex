@@ -7,7 +7,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { LoadingText } from './LoadingText';
 import { NewTransaction } from './NewTransaction';
-import { Popover } from 'bootstrap';
 import { compareTwoStrings } from 'string-similarity';
 
 export function Home() {
@@ -77,25 +76,9 @@ export function Home() {
 		setAccounts(similiar);
 	};
 
-	const popoverRef = useRef(null);
-	useEffect(() => {
-		loadPopover();
-	}, [loading]);
-	const loadPopover = () => {
-		let popoverInstance = null;
-
-		if (popoverRef.current) {
-			popoverInstance = new Popover(popoverRef.current, {
-				trigger: 'hover focus',
-				content: "New Transaction",
-				placement: 'left'
-			});
-		}
-	}
-
 	return (
 		<>
-			<div id='new-transaction-btn' className="position-absolute" ref={popoverRef} style={{
+			<div id='new-transaction-btn' className="position-absolute" style={{
 				right: '45px',
 				bottom: '35px'
 			}}>
