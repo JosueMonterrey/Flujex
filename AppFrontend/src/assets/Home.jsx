@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import { LoadingText } from './LoadingText';
 import { NewTransaction } from './NewTransaction';
 import { Popover } from 'bootstrap';
+import { compareTwoStrings } from 'string-similarity';
 
 export function Home() {
 
@@ -67,7 +68,9 @@ export function Home() {
 		let similiar = [];
 
 		allAccounts.forEach(acc => {
-			if (acc.account_name == query)
+			const similarity = compareTwoStrings(acc.account_name, query);
+
+			if (similarity >= 0.2)
 				similiar.push(acc);
 		});
 
