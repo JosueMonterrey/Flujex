@@ -13,8 +13,7 @@ Proyecto del curso **IC-4301 Bases de Datos 1** del ITCR. Primer semestre de 202
  - Realizar transacciones, incluso entre cuentas de distintas monedas.
  - Registrar gastos e ingresos.
  - Clasificar movimientos de ahorros en categorías personalizadas.
- - Establecer metas de ahorro.
- - Dictar presupuestos.
+ - Establecer presupuestos.
  - Registrar suscripciones y pagos automáticos periódicos.
  - Observar un dashboard con un resúmen de las finanzas de sus cuentas.
 
@@ -24,16 +23,16 @@ Proyecto del curso **IC-4301 Bases de Datos 1** del ITCR. Primer semestre de 202
 
 - **AppBackend/:** python3.
 - **AppFrontend/:** react+vite.
-- **DB/:** diagrama de la base de datos y script SQL de creación.
 - **Docs/:** especificación del proyecto y otros documentos.
+- **Monterrey_Josue_ProyectoII/:** documentación y scripts SQL.
 
 ---
 
 #### Base de datos
 
-Base de datos desarrollada en MySQL y normalizada hasta 3FN.
+Base de datos relacional desarrollada en MySQL 8.0 y normalizada hasta 6FN.
 
-![flujex_modelo.png](DB/flujex_modelo.png)
+![flujex_modelo.png](documentacion/imagenes/Diagrama%20Entidad-Relacion.png)
 
 ---
 
@@ -73,6 +72,6 @@ cd AppFrontend
 npm install
 
 # Para ejecutar el frontend
-npm run dev
+npm run dev -- --host
 ```
 

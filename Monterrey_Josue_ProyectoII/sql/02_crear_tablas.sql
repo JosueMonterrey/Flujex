@@ -1,8 +1,6 @@
--- 1. Creación de la Base de Datos
-CREATE DATABASE IF NOT EXISTS flujex;
 USE flujex;
 
--- 2. Tabla de Usuarios
+-- 1. Tabla de Usuarios
 CREATE TABLE user (
     user_id			INT				PRIMARY KEY	AUTO_INCREMENT,
     first_name 		VARCHAR(50)		NOT NULL,
@@ -21,7 +19,7 @@ CREATE TABLE user (
     INDEX idx_email (email)
 );
 
--- 3. Tabla de Monedas	
+-- 2. Tabla de Monedas	
 CREATE TABLE currency (
     currency_id		INT			PRIMARY KEY	AUTO_INCREMENT,
     code            VARCHAR(10) NOT NULL UNIQUE,
@@ -31,7 +29,7 @@ CREATE TABLE currency (
     INDEX idx_code (code)
 );
 
--- 4. Tabla de Cuentas
+-- 3. Tabla de Cuentas
 CREATE TABLE account (
     account_id		INT				PRIMARY KEY AUTO_INCREMENT,
     user_id			INT				NOT NULL,
@@ -48,7 +46,7 @@ CREATE TABLE account (
     INDEX idx_user_acc (user_id)
 );
 
--- 5. Tabla de Categorías
+-- 4. Tabla de Categorías
 CREATE TABLE category (
     category_id		INT									PRIMARY KEY	AUTO_INCREMENT,
     user_id         INT									NOT NULL,
@@ -64,7 +62,7 @@ CREATE TABLE category (
     INDEX idx_usr_category (user_id)
 );
 
--- 7. Tabla de Presupuestos Mensuales
+-- 5. Tabla de Presupuestos Mensuales
 CREATE TABLE budget (
     budget_id		INT				PRIMARY KEY AUTO_INCREMENT,
     account_id		INT				NOT NULL,
@@ -78,7 +76,7 @@ CREATE TABLE budget (
     UNIQUE KEY		budget_period(account_id, month, year, inactive_date)
 );
 
--- 8. Tabla de tipo de cambio
+-- 6. Tabla de tipo de cambio
 CREATE TABLE exchange_rate (
 	rate_id			INT				PRIMARY KEY AUTO_INCREMENT,
 	currency_id		INT				NOT NULL,
@@ -89,7 +87,7 @@ CREATE TABLE exchange_rate (
 	UNIQUE KEY		(currency_id, rate_date)
 );
 
--- 9. Tabla de Transacciones (Multimoneda)
+-- 7. Tabla de Transacciones
 CREATE TABLE transaction (
     transaction_id		INT											PRIMARY KEY	AUTO_INCREMENT,
     origin_acc_id		INT											NOT NULL,
@@ -111,7 +109,7 @@ CREATE TABLE transaction (
     INDEX idx_acc_history (origin_acc_id, transaction_date)
 );
 
--- 10. Tabla de Recibos
+-- 8. Tabla de Recibos
 CREATE TABLE receipt (
 	receipt_id		INT				PRIMARY KEY	AUTO_INCREMENT,
 	transaction_id	INT				NOT NULL	UNIQUE,
@@ -122,7 +120,7 @@ CREATE TABLE receipt (
 	CONSTRAINT fk_receipt_trans		FOREIGN KEY	(transaction_id)		REFERENCES transaction(transaction_id)		ON DELETE CASCADE
 );
 
--- 11. Tabla de Externos
+-- 9. Tabla de Externos
 CREATE TABLE external_source (
 	source_id		INT				PRIMARY KEY AUTO_INCREMENT,
 	transaction_id	INT				NOT NULL	UNIQUE,
@@ -131,7 +129,7 @@ CREATE TABLE external_source (
 	CONSTRAINT fk_src_trans			FOREIGN KEY (transaction_id)		REFERENCES transaction(transaction_id)		ON DELETE CASCADE
 );
 
--- 12. Tabla de Subscripciones
+-- 10. Tabla de Subscripciones
 CREATE TABLE subscription (
 	subscription_id		INT												PRIMARY KEY AUTO_INCREMENT,
 	account_id			INT												NOT NULL,
